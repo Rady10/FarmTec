@@ -1,7 +1,8 @@
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/onboarding/data/onboarding_page_model.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class OnboardingStatCard extends StatelessWidget {
   const OnboardingStatCard({
@@ -15,14 +16,19 @@ class OnboardingStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: colors.card.withAlpha(isDark ? 230 : 242),
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colors.outline.withAlpha(isDark ? 60 : 30)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: colors.shadow,
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -36,9 +42,10 @@ class OnboardingStatCard extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: highlight
-                    ? Pallete.primaryColor.withOpacity(0.1)
-                    : const Color(0xFFE8F5E9),
+                color:
+                    highlight
+                        ? colors.iconAccent.withAlpha(isDark ? 50 : 25)
+                        : colors.statGreenTint,
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -52,31 +59,30 @@ class OnboardingStatCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                data.label,
-                style: GoogleFonts.manrope(
+                l.tr(data.label),
+                style: AppFonts.font(
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.1,
-                  color: const Color(0xFF9CA3AF),
+                  color: colors.textHint,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
-                data.value,
-                style: GoogleFonts.manrope(
+                l.convertNumbers(l.tr(data.value)),
+                style: AppFonts.font(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: highlight
-                      ? Pallete.primaryColor
-                      : const Color(0xFF111827),
+                  color:
+                      highlight ? colors.iconAccent : colors.textPrimary,
                 ),
               ),
               if (data.subtitle != null)
                 Text(
-                  data.subtitle!,
-                  style: GoogleFonts.manrope(
+                  l.convertNumbers(l.tr(data.subtitle!)),
+                  style: AppFonts.font(
                     fontSize: 10,
-                    color: const Color(0xFF4CAF50),
+                    color: colors.iconAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/profile/presentation/widgets/profile_sheet.dart';
 import 'package:farmtec/features/profile/presentation/widgets/profile_sheet_field.dart';
@@ -58,7 +59,7 @@ class ProfileEditProfileSheet extends StatelessWidget {
                 SnackBar(
                   content: Text(
                     l.tr('profile_updated'),
-                    style: GoogleFonts.manrope(),
+                    style: AppFonts.font(),
                   ),
                   backgroundColor: Pallete.primary,
                   behavior: SnackBarBehavior.floating,

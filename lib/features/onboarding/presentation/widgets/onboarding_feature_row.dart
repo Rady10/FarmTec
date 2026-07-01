@@ -1,7 +1,8 @@
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/onboarding/data/onboarding_page_model.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class OnboardingFeatureRow extends StatelessWidget {
   const OnboardingFeatureRow({super.key, required this.feature});
@@ -10,12 +11,18 @@ class OnboardingFeatureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F4EE),
+        color: colors.statGreenTint,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFD1E8CA), width: 1),
+        border: Border.all(
+          color: colors.iconAccent.withAlpha(isDark ? 50 : 35),
+        ),
       ),
       child: Row(
         children: [
@@ -23,7 +30,7 @@ class OnboardingFeatureRow extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Pallete.primaryColor.withOpacity(0.1),
+              color: colors.iconAccent.withAlpha(isDark ? 40 : 25),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
@@ -39,19 +46,19 @@ class OnboardingFeatureRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  feature.title,
-                  style: GoogleFonts.manrope(
+                  l.tr(feature.title),
+                  style: AppFonts.font(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: Pallete.primaryColor,
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  feature.description,
-                  style: GoogleFonts.manrope(
+                  l.convertNumbers(l.tr(feature.description)),
+                  style: AppFonts.font(
                     fontSize: 12,
-                    color: const Color(0xFF6B7280),
+                    color: colors.textTertiary,
                     height: 1.4,
                   ),
                 ),

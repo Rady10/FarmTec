@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/utils/assets.dart';
 import 'package:farmtec/features/auth/presentation/screens/login_screen.dart';
@@ -69,7 +70,7 @@ class _SignupBodyState extends State<SignupBody>
                         const SizedBox(height: 28),
                         Text(
                           l.tr('create_account'),
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 30,
                             fontWeight: FontWeight.w800,
                             color: textColor,
@@ -79,7 +80,7 @@ class _SignupBodyState extends State<SignupBody>
                         const SizedBox(height: 6),
                         Text(
                           l.tr('sign_up_subtitle'),
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 14,
                             color: subColor,
                             height: 1.5,
@@ -139,32 +140,6 @@ class _SignupBodyState extends State<SignupBody>
                                     color: Pallete.textHint,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                children: [
-                                  FieldLabel(
-                                    text: l.tr('farm_name'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '(${l.tr('or')})',
-                                    style: GoogleFonts.manrope(
-                                      fontSize: 11,
-                                      color: Pallete.textHint,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              AppTextField(
-                                hint: 'Green Valley Farm',
-                                type: TextInputType.text,
-                                fillColor: fillColor,
-                                borderColor: borderColor,
-                                textColor: textColor,
-                                isRequired: false,
                               ),
                               const SizedBox(height: 14),
                               FieldLabel(
@@ -236,7 +211,7 @@ class _SignupBodyState extends State<SignupBody>
                             onPressed: () {},
                             child: Text(
                               l.tr('signup_button'),
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -249,14 +224,14 @@ class _SignupBodyState extends State<SignupBody>
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: l.tr('terms_prefix'),
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 fontSize: 12,
                                 color: subColor,
                               ),
                               children: [
                                 TextSpan(
                                   text: l.tr('terms_of_service'),
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                     color: Pallete.accent,
@@ -265,7 +240,7 @@ class _SignupBodyState extends State<SignupBody>
                                 TextSpan(text: l.tr('and')),
                                 TextSpan(
                                   text: l.tr('privacy_policy'),
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                     color: Pallete.accent,
@@ -284,7 +259,7 @@ class _SignupBodyState extends State<SignupBody>
                               children: [
                                 Text(
                                   l.tr('have_account'),
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 14,
                                     color: subColor,
                                   ),
@@ -298,7 +273,7 @@ class _SignupBodyState extends State<SignupBody>
                                   },
                                   child: Text(
                                     l.tr('login'),
-                                    style: GoogleFonts.manrope(
+                                    style: AppFonts.font(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: Pallete.accent,

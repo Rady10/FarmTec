@@ -1,3 +1,6 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/widgets/crop_avatar.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/farm/domain/entities/farm.dart';
 import 'package:farmtec/features/farm/presentation/extensions/farm_ui_extensions.dart';
@@ -26,6 +29,7 @@ class FarmSelectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -52,18 +56,10 @@ class FarmSelectionCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: farm.healthColor.withAlpha(25),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Icons.grass_rounded,
-                color: farm.healthColor,
-                size: 24,
-              ),
+            CropAvatar(
+              crop: farm.crop,
+              size: 50,
+              isDark: isDark,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -72,7 +68,7 @@ class FarmSelectionCard extends StatelessWidget {
                 children: [
                   Text(
                     farm.name,
-                    style: GoogleFonts.manrope(
+                    style: AppFonts.font(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: textColor,
@@ -84,31 +80,29 @@ class FarmSelectionCard extends StatelessWidget {
                       FarmTag(farm.crop, isDark: isDark, color: subColor),
                       const SizedBox(width: 6),
                       FarmTag(farm.area, isDark: isDark, color: subColor),
-                      if (farm.lat != 0) ...[
-                        const SizedBox(width: 6),
-                        FarmTag('📍 GPS', isDark: isDark, color: subColor),
-                      ],
                     ],
                   ),
                 ],
               ),
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Icon(farm.healthIcon, color: farm.healthColor, size: 22),
+                Icon(Icons.calendar_today_rounded, color: subColor, size: 18),
                 const SizedBox(height: 4),
                 Text(
-                  farm.healthLabel,
-                  style: GoogleFonts.manrope(
+                  farm.formatPlantingDate(l),
+                  style: AppFonts.font(
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: farm.healthColor,
+                    fontWeight: FontWeight.w600,
+                    color: subColor,
                   ),
+                  textAlign: TextAlign.end,
                 ),
               ],
             ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
+            const SizedBox(width: 8),
+            if (isSelected)
               Container(
                 width: 24,
                 height: 24,
@@ -122,7 +116,6 @@ class FarmSelectionCard extends StatelessWidget {
                   size: 14,
                 ),
               ),
-            ],
           ],
         ),
       ),

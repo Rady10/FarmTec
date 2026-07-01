@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class FarmHistoryTile extends StatelessWidget {
               children: [
                 Text(
                   operation.displayTitle(l),
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: textColor,
@@ -100,7 +101,7 @@ class FarmHistoryTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           l.trParams('activity_on_farm', {'farm': farmName}),
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: isDark ? Pallete.chartGreen : Pallete.primary,
@@ -116,7 +117,7 @@ class FarmHistoryTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     operation.description,
-                    style: GoogleFonts.manrope(fontSize: 11, color: subColor),
+                    style: AppFonts.font(fontSize: 11, color: subColor),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -127,7 +128,7 @@ class FarmHistoryTile extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             _timeAgo(operation.timestamp, l),
-            style: GoogleFonts.manrope(fontSize: 10, color: subColor),
+            style: AppFonts.font(fontSize: 10, color: subColor),
           ),
         ],
       ),

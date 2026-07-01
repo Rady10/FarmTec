@@ -1,8 +1,11 @@
+
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/features/farm/domain/entities/farm.dart';
 import 'package:farmtec/features/farm/presentation/extensions/farm_ui_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:farmtec/core/utils/crop_assets.dart';
 
 class FarmHeroCard extends StatelessWidget {
   final Farm farm;
@@ -47,10 +50,10 @@ class FarmHeroCard extends StatelessWidget {
               color: Colors.white.withAlpha(25),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(
-              Icons.agriculture_rounded,
-              color: Colors.white,
-              size: 30,
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(
+              CropAssets.imagePathFor(farm.crop),
+              fit: BoxFit.cover,
             ),
           ),
           const SizedBox(width: 16),
@@ -60,7 +63,7 @@ class FarmHeroCard extends StatelessWidget {
               children: [
                 Text(
                   farm.name,
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -75,17 +78,21 @@ class FarmHeroCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: farm.healthColor.withAlpha(50),
+                        color: Colors.white.withAlpha(38),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(farm.healthIcon, color: Colors.white, size: 12),
+                          const Icon(
+                            Icons.calendar_today_rounded,
+                            color: Colors.white,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            farm.healthLabel,
-                            style: GoogleFonts.manrope(
+                            farm.formatPlantingDate(l),
+                            style: AppFonts.font(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -94,11 +101,15 @@ class FarmHeroCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Text(
-                      '${l.tr(farm.crop.toLowerCase())} · ${l.convertNumbers(farm.area)}',
-                      style: GoogleFonts.manrope(
-                        fontSize: 12,
-                        color: Colors.white70,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${l.tr(farm.crop.toLowerCase())} · ${l.convertNumbers(farm.area)}',
+                        style: AppFonts.font(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

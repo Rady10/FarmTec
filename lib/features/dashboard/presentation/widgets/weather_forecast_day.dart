@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WeatherForecastDay extends StatelessWidget {
@@ -21,7 +22,7 @@ class WeatherForecastDay extends StatelessWidget {
       children: [
         Text(
           day,
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 10,
             fontWeight: FontWeight.w600,
             color: Colors.white54,
@@ -32,7 +33,7 @@ class WeatherForecastDay extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           high,
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: Colors.white,
@@ -40,7 +41,7 @@ class WeatherForecastDay extends StatelessWidget {
         ),
         Text(
           low,
-          style: GoogleFonts.manrope(fontSize: 10, color: Colors.white54),
+          style: AppFonts.font(fontSize: 10, color: Colors.white54),
         ),
       ],
     );

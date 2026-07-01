@@ -1,4 +1,6 @@
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -16,6 +18,7 @@ class ProfileSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -24,7 +27,7 @@ class ProfileSheet extends StatelessWidget {
         MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: BoxDecoration(
-        color: isDark ? Pallete.darkCard : Colors.white,
+        color: colors.card,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -36,7 +39,7 @@ class ProfileSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? Pallete.darkOutline : const Color(0xFFE5E7EB),
+                color: colors.outline,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -44,10 +47,10 @@ class ProfileSheet extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             title,
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
+              color: colors.textPrimary,
             ),
           ),
           const SizedBox(height: 20),
@@ -80,7 +83,7 @@ class ProfileSheetButton extends StatelessWidget {
         onPressed: onTap,
         child: Text(
           label,
-          style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700),
+          style: AppFonts.font(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
     );

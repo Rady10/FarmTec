@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,13 +23,13 @@ class ProfileSheetField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       obscureText: obscure,
-      style: GoogleFonts.manrope(
+      style: AppFonts.font(
         fontSize: 14,
         color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: GoogleFonts.manrope(
+        labelStyle: AppFonts.font(
           fontSize: 13,
           color: isDark ? Pallete.darkTextSecondary : const Color(0xFF9CA3AF),
         ),

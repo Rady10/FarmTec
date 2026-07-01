@@ -1,3 +1,5 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/features/market/data/models/commodity_model.dart';
 import 'package:farmtec/features/market/presentation/widgets/market_banner_stat.dart';
 import 'package:flutter/material.dart';
@@ -11,54 +13,63 @@ class MarketBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox.shrink();
 
-    final item1 = items.isNotEmpty ? items[0] : null;
-    final item2 = items.length > 1 ? items[1] : null;
-    final item3 = items.length > 2 ? items[2] : null;
+    final l = AppLocalizations.of(context);
+    final featured = items.take(3).toList();
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1B4332), Color(0xFF2D6A4F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF0C291F),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(25),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (item1 != null)
-            Expanded(
-              child: MarketBannerStat(
-                item1.name,
-                '\$${item1.price.toStringAsFixed(2)}',
-                '${item1.isUp ? '+' : ''}${item1.changePercent}%',
-                item1.isUp,
+          Row(
+            children: [
+              const Icon(
+                Icons.show_chart_rounded,
+                size: 15,
+                color: Color(0xFFFFB800),
               ),
-            ),
-          if (item1 != null && item2 != null)
-            Container(width: 1, height: 36, color: Colors.white24),
-          if (item2 != null)
-            Expanded(
-              child: MarketBannerStat(
-                item2.name,
-                '\$${item2.price.toStringAsFixed(2)}',
-                '${item2.isUp ? '+' : ''}${item2.changePercent}%',
-                item2.isUp,
+              const SizedBox(width: 6),
+              Text(
+                l.tr('market_snapshot'),
+                style: AppFonts.font(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withAlpha(180),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < featured.length; i++) ...[
+                  if (i > 0)
+                    Container(
+                      width: 1,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      color: Colors.white.withAlpha(20),
+                    ),
+                  Expanded(
+                    child: MarketBannerStat(featured[i]),
+                  ),
+                ],
+              ],
             ),
-          if (item2 != null && item3 != null)
-            Container(width: 1, height: 36, color: Colors.white24),
-          if (item3 != null)
-            Expanded(
-              child: MarketBannerStat(
-                item3.name,
-                '\$${item3.price.toStringAsFixed(2)}',
-                '${item3.isUp ? '+' : ''}${item3.changePercent}%',
-                item3.isUp,
-              ),
-            ),
+          ),
         ],
       ),
     );

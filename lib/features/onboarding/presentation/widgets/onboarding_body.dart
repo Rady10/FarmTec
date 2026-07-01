@@ -1,3 +1,6 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/services/preferences_service.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/widgets/custom_button.dart';
@@ -68,6 +71,9 @@ class _OnboardingBodyState extends State<OnboardingBody> {
   @override
   Widget build(BuildContext context) {
     final isLast = _currentPage == _totalPages - 1;
+    final l = AppLocalizations.of(context);
+
+    final colors = context.appColors;
 
     return SafeArea(
       child: Column(
@@ -87,12 +93,12 @@ class _OnboardingBodyState extends State<OnboardingBody> {
                   child: GestureDetector(
                     onTap: _skip,
                     child: Text(
-                      'SKIP',
-                      style: GoogleFonts.manrope(
+                      l.tr('skip').toUpperCase(),
+                      style: AppFonts.font(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
-                        color: Pallete.primaryColor,
+                        color: colors.iconAccent,
                       ),
                     ),
                   ),
@@ -123,7 +129,7 @@ class _OnboardingBodyState extends State<OnboardingBody> {
 
                 // Next / Get Started button
                 CustomButton(
-                  text: isLast ? 'Get Started' : 'Next',
+                  text: isLast ? l.tr('get_started') : l.tr('next'),
                   icon: Icons.arrow_forward_rounded,
                   onPressed: _nextPage,
                 ),
@@ -136,12 +142,12 @@ class _OnboardingBodyState extends State<OnboardingBody> {
                   child: GestureDetector(
                     onTap: _skip,
                     child: Text(
-                      'SKIP ONBOARDING',
-                      style: GoogleFonts.manrope(
+                      l.tr('skip_onboarding').toUpperCase(),
+                      style: AppFonts.font(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.2,
-                        color: const Color(0xFF9CA3AF),
+                        color: colors.textHint,
                         decoration: TextDecoration.none,
                       ),
                     ),

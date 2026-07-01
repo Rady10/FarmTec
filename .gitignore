@@ -1,8 +1,8 @@
 # Mapbox token (copy mapbox.env.example → mapbox.env)
-.mapbox.env
+mapbox.env
 
 # Agromonitoring NDVI API (copy agromonitoring.env.example → agromonitoring.env)
-.agromonitoring.env
+agromonitoring.env
 
 # Miscellaneous
 *.class

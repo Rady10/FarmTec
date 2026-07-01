@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +36,7 @@ class ChatEmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             l.tr('farmbrain_ai'),
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
@@ -44,7 +45,7 @@ class ChatEmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             l.tr('ask_anything'),
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 14,
               color: isDark ? Pallete.darkTextSecondary : Pallete.textHint,
             ),

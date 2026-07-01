@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:farmtec/core/constants/farm_icons.dart';
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,7 +46,7 @@ class FarmOperation {
       case OperationType.ndviScan:
         return Icons.satellite_alt_rounded;
       case OperationType.cropPlant:
-        return Icons.grass_rounded;
+        return FarmIcons.farm;
       case OperationType.weatherAlert:
         return Icons.cloud_rounded;
       case OperationType.aiModelRun:

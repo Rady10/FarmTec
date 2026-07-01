@@ -1,3 +1,4 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 enum SupportInfoPage { helpFaq, privacyPolicy, aboutUs, contact }
@@ -26,106 +27,102 @@ class SupportInfoData {
     required this.sections,
   });
 
-  factory SupportInfoData.forPage(SupportInfoPage page) {
+  factory SupportInfoData.forPage(SupportInfoPage page, AppLocalizations l) {
     switch (page) {
       case SupportInfoPage.helpFaq:
-        return const SupportInfoData(
-          title: 'Help & FAQ',
-          heading: 'How can we help?',
-          summary:
-              'Quick answers for the whole FarmTec app: dashboard, farms, AI models, NDVI, market data, notifications, profile, and account settings.',
+        return SupportInfoData(
+          title: l.tr('help_faq'),
+          heading: l.tr('help_faq_heading'),
+          summary: l.tr('help_faq_summary'),
           icon: Icons.help_outline_rounded,
-          color: Color(0xFF2196F3),
+          color: const Color(0xFF2196F3),
           sections: [
-            SupportInfoSection('Using NDVI', [
-              'Open My Farm, select a field, then tap Run Scan to refresh the vegetation index.',
-              'Scores near 1.00 indicate strong plant vigor. Lower scores point to water, nutrient, or disease stress.',
+            SupportInfoSection(l.tr('faq_sec_ndvi'), [
+              l.tr('faq_sec_ndvi_line1'),
+              l.tr('faq_sec_ndvi_line2'),
             ]),
-            SupportInfoSection('Dashboard and profit', [
-              'The dashboard summarizes weather, farm status, tasks, market context, and projected gross profit.',
-              'Profit uses the latest Yield Prediction model result, then multiplies it by the current market price.',
+            SupportInfoSection(l.tr('faq_sec_dash'), [
+              l.tr('faq_sec_dash_line1'),
+              l.tr('faq_sec_dash_line2'),
             ]),
-            SupportInfoSection('AI models', [
-              'Open AI Models to run crop recommendation, disease detection, yield prediction, irrigation, weather, and nutrient tools.',
-              'Yield Prediction saves its latest result so the profit calculator can use the same number.',
+            SupportInfoSection(l.tr('faq_sec_ai'), [
+              l.tr('faq_sec_ai_line1'),
+              l.tr('faq_sec_ai_line2'),
             ]),
-            SupportInfoSection('Managing fields', [
-              'Use Add Field to save a field name, crop, area, and GPS location.',
-              'Tap any field card to view crop lifecycle, soil readings, NDVI analysis, activity, and AI insights.',
+            SupportInfoSection(l.tr('faq_sec_fields'), [
+              l.tr('faq_sec_fields_line1'),
+              l.tr('faq_sec_fields_line2'),
             ]),
-            SupportInfoSection('Crop lifecycle', [
-              'Lifecycle cards show stage windows and field actions for every available crop.',
-              'Supported crops include Wheat, Maize, Rice, Tomato, Potato, Mango, Jowar (Sorghum), and Green Fodder.',
+            SupportInfoSection(l.tr('faq_sec_lifecycle'), [
+              l.tr('faq_sec_lifecycle_line1'),
+              l.tr('faq_sec_lifecycle_line2'),
             ]),
-            SupportInfoSection('Market and notifications', [
-              'Market shows commodity prices and forecast details for supported crops.',
-              'Profile controls push notifications plus weather and market price alert categories.',
+            SupportInfoSection(l.tr('faq_sec_market'), [
+              l.tr('faq_sec_market_line1'),
+              l.tr('faq_sec_market_line2'),
             ]),
-            SupportInfoSection('Alerts and notifications', [
-              'Weather and market price alerts can be enabled or disabled from Profile.',
-              'Critical field health should be inspected in person before applying treatment.',
+            SupportInfoSection(l.tr('faq_sec_alerts'), [
+              l.tr('faq_sec_alerts_line1'),
+              l.tr('faq_sec_alerts_line2'),
             ]),
           ],
         );
       case SupportInfoPage.privacyPolicy:
-        return const SupportInfoData(
-          title: 'Privacy Policy',
-          heading: 'Your farm data stays yours',
-          summary:
-              'FarmTec uses account, field, and location data only to provide farm monitoring, recommendations, and app functionality.',
+        return SupportInfoData(
+          title: l.tr('privacy_policy'),
+          heading: l.tr('privacy_heading'),
+          summary: l.tr('privacy_summary'),
           icon: Icons.privacy_tip_outlined,
-          color: Color(0xFF7C3AED),
+          color: const Color(0xFF7C3AED),
           sections: [
-            SupportInfoSection('Data we use', [
-              'Profile details, selected farms, crop information, field locations, and app preferences.',
-              'Location is used for maps, weather context, field boundaries, and vegetation analysis.',
+            SupportInfoSection(l.tr('privacy_sec_data'), [
+              l.tr('privacy_sec_data_line1'),
+              l.tr('privacy_sec_data_line2'),
             ]),
-            SupportInfoSection('How data is protected', [
-              'Local preferences are stored on the device for faster access.',
-              'We do not sell personal or farm data. Shared reports should be sent only to people you trust.',
+            SupportInfoSection(l.tr('privacy_sec_protect'), [
+              l.tr('privacy_sec_protect_line1'),
+              l.tr('privacy_sec_protect_line2'),
             ]),
-            SupportInfoSection('Your choices', [
-              'You can update profile details, change notification settings, or sign out from Profile.',
-              'Remove saved farms when you no longer want them available in the app.',
+            SupportInfoSection(l.tr('privacy_sec_choices'), [
+              l.tr('privacy_sec_choices_line1'),
+              l.tr('privacy_sec_choices_line2'),
             ]),
           ],
         );
       case SupportInfoPage.aboutUs:
-        return const SupportInfoData(
-          title: 'About Us',
-          heading: 'Precision intelligence for farms',
-          summary:
-              'FarmTec brings field monitoring, satellite-style vegetation analysis, market context, and AI guidance into one mobile workspace.',
+        return SupportInfoData(
+          title: l.tr('about_us'),
+          heading: l.tr('about_heading'),
+          summary: l.tr('about_summary'),
           icon: Icons.info_outline_rounded,
-          color: Color(0xFF1B8F3A),
+          color: const Color(0xFF1B8F3A),
           sections: [
-            SupportInfoSection('What we build', [
-              'Tools that help growers understand crop health, soil condition, irrigation needs, and market movement.',
-              'Simple field workflows that make data useful while work is happening.',
+            SupportInfoSection(l.tr('about_sec_build'), [
+              l.tr('about_sec_build_line1'),
+              l.tr('about_sec_build_line2'),
             ]),
-            SupportInfoSection('Our approach', [
-              'Clear recommendations, practical metrics, and fast access from the farm dashboard.',
-              'AI support is designed to assist decisions, not replace field inspection or agronomic judgment.',
+            SupportInfoSection(l.tr('about_sec_approach'), [
+              l.tr('about_sec_approach_line1'),
+              l.tr('about_sec_approach_line2'),
             ]),
           ],
         );
       case SupportInfoPage.contact:
-        return const SupportInfoData(
-          title: 'Contact',
-          heading: 'Talk to FarmTec support',
-          summary:
-              'Reach out for account help, field setup questions, product feedback, or partnership conversations.',
+        return SupportInfoData(
+          title: l.tr('contact'),
+          heading: l.tr('contact_heading'),
+          summary: l.tr('contact_summary'),
           icon: Icons.contact_support_outlined,
-          color: Color(0xFFFF9800),
+          color: const Color(0xFFFF9800),
           sections: [
-            SupportInfoSection('Support', [
-              'Email: support@farmtec.io',
-              'Phone: +20 100 000 0000',
-              'Hours: Sunday to Thursday, 9:00 AM - 6:00 PM Cairo time.',
+            SupportInfoSection(l.tr('contact_sec_support'), [
+              l.tr('contact_sec_support_line1'),
+              l.tr('contact_sec_support_line2'),
+              l.tr('contact_sec_support_line3'),
             ]),
-            SupportInfoSection('When contacting us', [
-              'Include your farm name, field name, crop, and the screen where you saw the issue.',
-              'For NDVI or map issues, include the field GPS location if available.',
+            SupportInfoSection(l.tr('contact_sec_when'), [
+              l.tr('contact_sec_when_line1'),
+              l.tr('contact_sec_when_line2'),
             ]),
           ],
         );

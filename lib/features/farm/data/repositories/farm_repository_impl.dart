@@ -48,6 +48,17 @@ class FarmRepositoryImpl implements FarmRepository {
     await _dataSource.saveFarms(_farms, _selectedFarmId);
   }
 
+  @override
+  Future<void> updateFarm(Farm farm) async {
+    final index = _farms.indexWhere((f) => f.id == farm.id);
+    if (index != -1) {
+      final updatedList = List<Farm>.from(_farms);
+      updatedList[index] = farm;
+      _farms = updatedList;
+      await _dataSource.saveFarms(_farms, _selectedFarmId);
+    }
+  }
+
   Future<void> _reload() async {
     _farms = await _dataSource.loadFarms();
     _selectedFarmId = await _dataSource.loadSelectedFarmId();

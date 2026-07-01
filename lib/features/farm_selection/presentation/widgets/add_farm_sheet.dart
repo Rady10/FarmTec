@@ -1,7 +1,11 @@
+import 'package:farmtec/core/constants/farm_icons.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/widgets/farm_marker_icon.dart';
 import 'package:farmtec/core/map/satellite_map_tiles.dart';
 import 'package:farmtec/core/services/crop_lifecycle_service.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/features/farm_selection/presentation/widgets/farm_sheet_field.dart';
@@ -129,10 +133,11 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
     final l = AppLocalizations.of(context);
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final fillColor = isDark ? Pallete.darkSurfaceVariant : Pallete.background;
+    final textColor = colors.textPrimary;
+    final fillColor = colors.surfaceVariant;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -142,7 +147,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
         MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: BoxDecoration(
-        color: isDark ? Pallete.darkCard : Colors.white,
+        color: colors.card,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SingleChildScrollView(
@@ -155,7 +160,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Pallete.darkOutline : Pallete.neutral200,
+                  color: colors.outline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -163,7 +168,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
             const SizedBox(height: 20),
             Text(
               l.tr('add_farm'),
-              style: GoogleFonts.manrope(
+              style: AppFonts.font(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: textColor,
@@ -174,7 +179,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
             FarmSheetField(
               label: l.tr('farm_name'),
               ctrl: _nameCtrl,
-              icon: Icons.grass_rounded,
+              icon: FarmIcons.farm,
               isDark: isDark,
               fillColor: fillColor,
               textColor: textColor,
@@ -208,7 +213,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
 
             Text(
               l.tr('location'),
-              style: GoogleFonts.manrope(
+              style: AppFonts.font(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: textColor,
@@ -264,7 +269,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                         ),
                 label: Text(
                   _loadingGps ? l.tr('fetching_gps') : l.tr('use_gps'),
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontWeight: FontWeight.w700,
                     color: Pallete.primary,
                   ),
@@ -332,7 +337,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                 },
                 child: Text(
                   l.tr('add_farm'),
-                  style: GoogleFonts.manrope(fontWeight: FontWeight.w700),
+                  style: AppFonts.font(fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -348,6 +353,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
     Color textColor,
     Color fillColor,
   ) {
+    final colors = context.appColors;
     final dateLabel =
         '${_plantedAt.year}-${_plantedAt.month.toString().padLeft(2, '0')}-${_plantedAt.day.toString().padLeft(2, '0')}';
 
@@ -356,7 +362,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
       children: [
         Text(
           l.tr('planting_date'),
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 14,
             fontWeight: FontWeight.w700,
             color: textColor,
@@ -387,7 +393,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                 const SizedBox(width: 12),
                 Text(
                   l.convertNumbers(dateLabel),
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: textColor,
@@ -396,9 +402,9 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                 const Spacer(),
                 Text(
                   l.tr('select_planting_date'),
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 11,
-                    color: isDark ? Pallete.darkTextSecondary : Pallete.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -410,6 +416,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
   }
 
   Widget _buildMapPreview(bool isDark) {
+    final colors = context.appColors;
     final l = AppLocalizations.of(context);
     final lat = double.tryParse(_latCtrl.text) ?? 0;
     final lng = double.tryParse(_lngCtrl.text) ?? 0;
@@ -425,27 +432,24 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
             Icon(
               Icons.satellite_alt_rounded,
               size: 16,
-              color: isDark ? Pallete.darkTextSecondary : Pallete.textSecondary,
+              color: colors.textSecondary,
             ),
             const SizedBox(width: 6),
             Text(
               l.tr('map_preview'),
-              style: GoogleFonts.manrope(
+              style: AppFonts.font(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
+                color: colors.textPrimary,
               ),
             ),
             const Spacer(),
             if (!hasCoords)
               Text(
                 l.tr('tap_map_set_location'),
-                style: GoogleFonts.manrope(
+                style: AppFonts.font(
                   fontSize: 10,
-                  color:
-                      isDark
-                          ? Pallete.darkTextSecondary
-                          : Pallete.textSecondary,
+                  color: colors.textSecondary,
                 ),
               ),
           ],
@@ -458,7 +462,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? Pallete.darkOutline : const Color(0xFFE6E9E9),
+              color: colors.outline,
               width: 1.5,
             ),
           ),
@@ -487,25 +491,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                             point: LatLng(lat, lng),
                             width: 36,
                             height: 36,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Pallete.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(80),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.agriculture_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
+                            child: const FarmMarkerIcon(size: 36, iconSize: 18),
                           ),
                         ],
                       ),
@@ -526,7 +512,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                       ),
                       child: Text(
                         AppLocalizations.of(context).tr('map_satellite_attribution'),
-                        style: GoogleFonts.manrope(
+                        style: AppFonts.font(
                           fontSize: 8,
                           color: Colors.white70,
                         ),

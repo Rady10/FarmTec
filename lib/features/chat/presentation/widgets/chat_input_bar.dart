@@ -1,7 +1,7 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ChatInputBar extends StatelessWidget {
   final bool isDark;
@@ -23,62 +23,56 @@ class ChatInputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final barBg = isDark ? Pallete.darkSurface : Colors.white;
-    final fieldBg = isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF3F4ED);
+    final barBg = isDark ? Pallete.darkBackground : Pallete.background;
+    final fieldBg = isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF3F4F0);
     final borderClr = isDark ? Pallete.darkOutline : const Color(0xFFE2E3DC);
     final textClr = isDark ? Pallete.darkTextPrimary : Pallete.textPrimary;
     final hintClr = isDark ? Pallete.darkTextTertiary : Pallete.textHint;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-        14,
+        16,
         10,
-        14,
+        16,
         MediaQuery.of(context).padding.bottom + 12,
       ),
-      decoration: BoxDecoration(
-        color: barBg,
-        border: Border(top: BorderSide(color: borderClr, width: 0.5)),
-      ),
+      color: barBg,
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: textController,
               focusNode: focusNode,
-              style: GoogleFonts.manrope(fontSize: 14, color: textClr),
+              style: AppFonts.font(fontSize: 14, color: textClr),
               cursorColor: isDark ? Pallete.chartGreen : Pallete.primary,
               decoration: InputDecoration(
                 hintText: l.tr('ask_anything'),
-                hintStyle: GoogleFonts.manrope(fontSize: 14, color: hintClr),
+                hintStyle: AppFonts.font(fontSize: 14, color: hintClr),
                 filled: true,
                 fillColor: fieldBg,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: borderClr, width: 0.5),
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: BorderSide(color: borderClr),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: borderClr, width: 0.5),
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: BorderSide(color: borderClr),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(28),
                   borderSide: BorderSide(
                     color: isDark ? Pallete.chartGreen : Pallete.primary,
                     width: 1.5,
                   ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
+                  horizontal: 18,
                   vertical: 14,
                 ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.attach_file_rounded,
-                    color: isDark ? Pallete.darkTextTertiary : Pallete.textHint,
-                    size: 20,
-                  ),
-                  onPressed: () {},
+                prefixIcon: Icon(
+                  Icons.attach_file_rounded,
+                  color: isDark ? Pallete.darkTextTertiary : Pallete.textHint,
+                  size: 20,
                 ),
                 isDense: true,
               ),
@@ -97,20 +91,28 @@ class ChatInputBar extends StatelessWidget {
                 color: (isDark ? Pallete.chartGreen : Pallete.primary)
                     .withAlpha(isSending ? 120 : 255),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Pallete.primary.withAlpha(40),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              child: isSending
-                  ? const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+              child:
+                  isSending
+                      ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : const Icon(
+                        Icons.arrow_upward_rounded,
                         color: Colors.white,
+                        size: 20,
                       ),
-                    )
-                  : const Icon(
-                      Icons.arrow_upward_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
             ),
           ),
         ],

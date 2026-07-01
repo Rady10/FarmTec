@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/features/profile/presentation/widgets/support_info_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,7 +37,7 @@ class SupportInfoSectionCard extends StatelessWidget {
         children: [
           Text(
             section.title,
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: textColor,
@@ -61,7 +62,7 @@ class SupportInfoSectionCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       line,
-                      style: GoogleFonts.manrope(
+                      style: AppFonts.font(
                         fontSize: 12.5,
                         height: 1.45,
                         color: subColor,

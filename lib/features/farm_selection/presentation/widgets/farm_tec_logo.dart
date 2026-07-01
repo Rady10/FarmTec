@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,7 +23,7 @@ class FarmTecLogo extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           'FarmTec',
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: isDark ? Pallete.darkTextPrimary : Pallete.primary,

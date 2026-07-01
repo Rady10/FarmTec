@@ -26,35 +26,34 @@ class SplashParticles extends StatelessWidget {
         final speed = 0.3 + rng.nextDouble() * 0.7;
         final delay = rng.nextDouble();
 
-        return Positioned.fill(
-          child: AnimatedBuilder(
-            animation: particleAnimation,
-            builder: (context, _) {
-              final t = ((particleAnimation.value + delay) % 1.0) * speed;
-              final x = startX + math.sin(t * math.pi * 2 + i) * 0.05;
-              final y = startY - t * 0.3;
-              final opacity = (1 - t).clamp(0.0, 0.4) * iconScale.value;
+        return AnimatedBuilder(
+          animation: particleAnimation,
+          builder: (context, _) {
+            final t = ((particleAnimation.value + delay) % 1.0) * speed;
+            final x = startX + math.sin(t * math.pi * 2 + i) * 0.05;
+            final y = startY - t * 0.3;
+            final opacity = (1 - t).clamp(0.0, 0.4) * iconScale.value;
 
-              return Positioned(
-                left: x * MediaQuery.of(context).size.width,
-                top: (y % 1.0) * MediaQuery.of(context).size.height,
-                child: Opacity(
-                  opacity: opacity,
-                  child: Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Pallete.chartGreen.withAlpha(80)
-                          : Pallete.primary.withAlpha(50),
-                      shape: BoxShape.circle,
-                    ),
+            return Positioned(
+              left: x * MediaQuery.of(context).size.width,
+              top: (y % 1.0) * MediaQuery.of(context).size.height,
+              child: Opacity(
+                opacity: opacity,
+                child: Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Pallete.chartGreen.withAlpha(80)
+                        : Pallete.primary.withAlpha(50),
+                    shape: BoxShape.circle,
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
+
       }),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DashboardSectionLabel extends StatelessWidget {
@@ -21,7 +22,7 @@ class DashboardSectionLabel extends StatelessWidget {
         const SizedBox(width: 7),
         Text(
           title,
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 15,
             fontWeight: FontWeight.w700,
             color: color,

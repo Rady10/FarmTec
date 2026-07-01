@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
@@ -39,7 +40,7 @@ class FarmHistoryTab extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               l.tr('no_activity_yet'),
-              style: GoogleFonts.manrope(
+              style: AppFonts.font(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: subColor,

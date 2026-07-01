@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:farmtec/core/themes/app_fonts.dart';
 
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_background.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:flutter/material.dart';
@@ -26,22 +29,11 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   String? _result;
   bool _isError = false;
 
-  static const _descs = {
-    'Crop Recommendation':
-        'Analyzes soil composition, weather patterns, and climate data to recommend the most profitable crop for your field conditions.',
-    'Yield Prediction':
-        'Combines satellite imagery, weather forecasts, and historical data to forecast expected harvest with high accuracy.',
-    'Irrigation Planner':
-        'Calculates optimal irrigation from soil moisture, evapotranspiration, and precipitation forecasts.',
-    'Market Forecast':
-        'Commodity price forecasting from live market data to time your sales for maximum profit.',
-  };
-
-  static const _stats = {
-    'Crop Recommendation': {'Accuracy': '94%', 'Speed': '1.2s', 'Runs': '2.4K'},
-    'Yield Prediction': {'Accuracy': '92%', 'Speed': '1.5s', 'Runs': '5.6K'},
-    'Irrigation Planner': {'Accuracy': '93%', 'Speed': '1.8s', 'Runs': '3.2K'},
-    'Market Forecast': {'Accuracy': '89%', 'Speed': '0.6s', 'Runs': '12K'},
+  static const _statValues = {
+    'Crop Recommendation': {'accuracy': '94%', 'speed': '1.2s', 'runs': '2.4K'},
+    'Yield Prediction': {'accuracy': '92%', 'speed': '1.5s', 'runs': '5.6K'},
+    'Irrigation Planner': {'accuracy': '93%', 'speed': '1.8s', 'runs': '3.2K'},
+    'Market Forecast': {'accuracy': '89%', 'speed': '0.6s', 'runs': '12K'},
   };
 
   @override
@@ -131,7 +123,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
       if (!mounted) return;
       if (response.statusCode == 200) {
         final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-        _result = _fmt(decoded);
+        _result = _fmt(decoded, AppLocalizations.of(context));
         if (mounted) await _persistResult(decoded);
       } else {
         _isError = true;
@@ -216,22 +208,38 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     }
   }
 
-  String _fmt(dynamic d) {
+  String _fmt(dynamic d, AppLocalizations l) {
     switch (widget.model.name) {
       case 'Crop Recommendation':
         final c =
             (d['predicted_crop'] ?? d['prediction'] ?? 'Unknown').toString();
-        return '🌾 Recommended: ${c.isNotEmpty ? c[0].toUpperCase() + c.substring(1) : c}';
+        final crop =
+            c.isNotEmpty ? c[0].toUpperCase() + c.substring(1) : c;
+        return l.convertNumbers(
+          l.trParams('recommended_crop', {'crop': crop}),
+        );
       case 'Yield Prediction':
         final y = d['predicted_yield'] ?? d['yield'] ?? d['prediction'];
-        return y != null
-            ? '📊 Yield: ${(y is num ? y.toStringAsFixed(2) : y)} ${d['unit'] ?? 't/ha'}'
-            : '📊 $d';
+        if (y == null) return '📊 $d';
+        final yieldStr = y is num ? y.toStringAsFixed(2) : y.toString();
+        return l.convertNumbers(
+          l.trParams('yield_predicted', {
+            'yield': yieldStr,
+            'unit': (d['unit'] ?? 't/ha').toString(),
+          }),
+        );
       case 'Irrigation Planner':
-        return '💧 Need: ${d['irrigation_need_mm'] ?? 'N/A'}mm (${d['irrigation_class'] ?? 'N/A'})';
+        return l.convertNumbers(
+          l.trParams('irrigation_need', {
+            'need': '${d['irrigation_need_mm'] ?? 'N/A'}',
+            'class': '${d['irrigation_class'] ?? 'N/A'}',
+          }),
+        );
       case 'Market Forecast':
         if (d is List && d.isNotEmpty) {
-          return '📈 Forecast:\n${d.take(5).map((e) => '  • ${e['commodity']}: \$${(e['price'] as num).toStringAsFixed(2)}/t').join('\n')}';
+          return l.convertNumbers(
+            '📈 Forecast:\n${d.take(5).map((e) => '  • ${e['commodity']}: \$${(e['price'] as num).toStringAsFixed(2)}${l.tr('per_ton')}').join('\n')}',
+          );
         }
         return '📈 $d';
       default:
@@ -242,42 +250,46 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Pallete.darkBackground : Pallete.background;
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
-    final fillColor = isDark ? Pallete.darkSurfaceVariant : Pallete.background;
-    final cardColor = isDark ? Pallete.darkCard : Colors.white;
-    final desc = _descs[widget.model.name] ?? widget.model.desc;
-    final stats =
-        _stats[widget.model.name] ?? {'Accuracy': '90%', 'Speed': '1s', 'Runs': '1K'};
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+    final bgColor = colors.background;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
+    final fillColor = colors.surfaceVariant;
+    final cardColor = colors.card;
+    final descKey =
+        '${widget.model.name.toLowerCase().replaceAll(' ', '_')}_desc';
+    final desc = l.tr(descKey);
+    final statValues = _statValues[widget.model.name] ??
+        {'accuracy': '90%', 'speed': '1s', 'runs': '1K'};
+    final stats = {
+      l.tr('stat_accuracy'): l.convertNumbers(statValues['accuracy']!),
+      l.tr('stat_speed'): l.convertNumbers(statValues['speed']!),
+      l.tr('stat_runs'): l.convertNumbers(statValues['runs']!),
+    };
+    const accentGreen = Pallete.aiModelGreen;
 
     return Scaffold(
       backgroundColor: bgColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 260,
+            expandedHeight: 280,
             pinned: true,
-            backgroundColor: widget.model.color,
+            backgroundColor: bgColor,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      widget.model.color,
-                      widget.model.color.withAlpha(180),
-                      bgColor,
-                    ],
-                    stops: const [0.0, 0.65, 1.0],
-                  ),
-                ),
+              background: AiModelBackground(
+                imageAsset: widget.model.backgroundImage,
+                gradientColors: [
+                  Colors.black.withAlpha(70),
+                  Colors.black.withAlpha(140),
+                  bgColor,
+                ],
+                gradientStops: const [0.0, 0.6, 1.0],
                 child: SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -289,9 +301,13 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white.withAlpha(35),
                           borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withAlpha(50),
+                            width: 1,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withAlpha(50),
+                              color: Colors.black.withAlpha(80),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -308,7 +324,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         l.tr(
                           widget.model.name.toLowerCase().replaceAll(' ', '_'),
                         ),
-                        style: GoogleFonts.manrope(
+                        style: AppFonts.font(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
@@ -326,7 +342,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         ),
                         child: Text(
                           'FarmBrain ML · HuggingFace',
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                             color: Colors.white70,
@@ -366,16 +382,16 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                               children: [
                                 Text(
                                   e.value,
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w800,
-                                    color: widget.model.color,
+                                    color: accentGreen,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   e.key,
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 11,
                                     color: subColor,
                                   ),
@@ -389,7 +405,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                   const SizedBox(height: 20),
                   Text(
                     l.tr('about'),
-                    style: GoogleFonts.manrope(
+                    style: AppFonts.font(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: textColor,
@@ -398,7 +414,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                   const SizedBox(height: 6),
                   Text(
                     desc,
-                    style: GoogleFonts.manrope(
+                    style: AppFonts.font(
                       fontSize: 13,
                       color: subColor,
                       height: 1.6,
@@ -408,7 +424,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                   if (widget.model.fields.isNotEmpty) ...[
                     Text(
                       l.tr('input_parameters'),
-                      style: GoogleFonts.manrope(
+                      style: AppFonts.font(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: textColor,
@@ -417,7 +433,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                     const SizedBox(height: 4),
                     Text(
                       l.tr('auto_filled_gps'),
-                      style: GoogleFonts.manrope(fontSize: 12, color: subColor),
+                      style: AppFonts.font(fontSize: 12, color: subColor),
                     ),
                     const SizedBox(height: 14),
                     ...widget.model.fields.map(
@@ -426,7 +442,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         child: TextField(
                           controller: _controllers[f.key],
                           keyboardType: f.type,
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 14,
                             color: textColor,
                           ),
@@ -441,15 +457,13 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                                             ? l.tr('crop_type')
                                             : f.label,
                             hintText: f.hint,
-                            labelStyle: GoogleFonts.manrope(
+                            labelStyle: AppFonts.font(
                               fontSize: 13,
                               color: subColor,
                             ),
-                            hintStyle: GoogleFonts.manrope(
+                            hintStyle: AppFonts.font(
                               fontSize: 13,
-                              color: isDark
-                                  ? Pallete.darkTextTertiary
-                                  : Pallete.textHint,
+                              color: colors.textHint,
                             ),
                             filled: true,
                             fillColor: fillColor,
@@ -460,7 +474,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide(
-                                color: widget.model.color,
+                                color: accentGreen,
                                 width: 1.5,
                               ),
                             ),
@@ -479,10 +493,9 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                     height: 56,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: widget.model.color,
+                        backgroundColor: accentGreen,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor:
-                            widget.model.color.withAlpha(100),
+                        disabledBackgroundColor: accentGreen.withAlpha(100),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -503,7 +516,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                             )
                           : Text(
                               l.tr('run_prediction'),
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -521,13 +534,13 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         border: Border.all(
                           color: _isError
                               ? Pallete.error.withAlpha(60)
-                              : widget.model.color.withAlpha(60),
+                              : accentGreen.withAlpha(60),
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: (_isError
                                     ? Pallete.error
-                                    : widget.model.color)
+                                    : accentGreen)
                                 .withAlpha(15),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
@@ -545,13 +558,13 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                                     : Icons.insights_rounded,
                                 color: _isError
                                     ? Pallete.error
-                                    : widget.model.color,
+                                    : accentGreen,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 _isError ? l.tr('error') : l.tr('prediction_results'),
-                                style: GoogleFonts.manrope(
+                                style: AppFonts.font(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
                                   color: textColor,
@@ -562,7 +575,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                           const SizedBox(height: 14),
                           Text(
                             _result!,
-                            style: GoogleFonts.manrope(
+                            style: AppFonts.font(
                               fontSize: 13,
                               color: textColor,
                               height: 1.6,

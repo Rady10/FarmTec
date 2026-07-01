@@ -1,29 +1,50 @@
-import 'package:farmtec/core/services/app_notification_service.dart';
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class NotificationCard extends StatelessWidget {
   final AppNotification item;
 
   const NotificationCard({super.key, required this.item});
 
+  String _title(AppLocalizations l) {
+    if (item.titleKey != null) return l.tr(item.titleKey!);
+    return item.title;
+  }
+
+  String _body(AppLocalizations l) {
+    if (item.bodyKey != null) {
+      final text = item.bodyParams != null
+          ? l.trParams(item.bodyKey!, item.bodyParams!)
+          : l.tr(item.bodyKey!);
+      return l.convertNumbers(text);
+    }
+    return l.convertNumbers(item.body);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: item.isRead ? Colors.white : item.color.withAlpha(10),
+        color: item.isRead ? colors.card : item.color.withAlpha(isDark ? 30 : 10),
         borderRadius: BorderRadius.circular(16),
         border: item.isRead
-            ? null
-            : Border.all(color: item.color.withAlpha(60), width: 1),
-        boxShadow: const [
+            ? Border.all(color: colors.outline.withAlpha(isDark ? 80 : 40))
+            : Border.all(color: item.color.withAlpha(isDark ? 90 : 60), width: 1),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0A000000),
+            color: colors.shadow,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -34,7 +55,7 @@ class NotificationCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: item.color.withAlpha(25),
+              color: item.color.withAlpha(isDark ? 40 : 25),
               borderRadius: BorderRadius.circular(13),
             ),
             child: Icon(_iconFor(item.type), color: item.color, size: 20),
@@ -49,11 +70,11 @@ class NotificationCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        item.title,
-                        style: GoogleFonts.manrope(
+                        _title(l),
+                        style: AppFonts.font(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Pallete.primaryColor,
+                          color: colors.textPrimary,
                         ),
                       ),
                     ),
@@ -70,19 +91,19 @@ class NotificationCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  item.body,
-                  style: GoogleFonts.manrope(
+                  _body(l),
+                  style: AppFonts.font(
                     fontSize: 12,
-                    color: const Color(0xFF6B7280),
+                    color: colors.textTertiary,
                     height: 1.4,
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  item.time,
-                  style: GoogleFonts.manrope(
+                  l.tr(item.timeKey),
+                  style: AppFonts.font(
                     fontSize: 11,
-                    color: const Color(0xFFBDBDBD),
+                    color: colors.textHint,
                   ),
                 ),
               ],

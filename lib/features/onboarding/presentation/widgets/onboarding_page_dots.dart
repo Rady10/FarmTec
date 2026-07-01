@@ -1,4 +1,4 @@
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingPageDots extends StatelessWidget {
@@ -13,6 +13,9 @@ class OnboardingPageDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(total, (index) {
@@ -24,7 +27,10 @@ class OnboardingPageDots extends StatelessWidget {
           width: isActive ? 28 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive ? Pallete.primaryColor : const Color(0xFFD1D5DB),
+            color:
+                isActive
+                    ? colors.iconAccent
+                    : colors.outline.withAlpha(isDark ? 120 : 180),
             borderRadius: BorderRadius.circular(100),
           ),
         );

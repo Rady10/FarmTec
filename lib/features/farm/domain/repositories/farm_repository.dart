@@ -6,4 +6,5 @@ abstract class FarmRepository {
   Future<void> selectFarm(String farmId);
   Future<void> addFarm(Farm farm);
   Future<void> removeFarm(String farmId);
+  Future<void> updateFarm(Farm farm);
 }

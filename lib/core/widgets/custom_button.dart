@@ -1,4 +1,3 @@
-import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/themes/text_styles.dart';
 import 'package:flutter/material.dart';
 
@@ -24,15 +23,6 @@ class CustomButton extends StatelessWidget {
       width: width ?? double.infinity,
       height: height,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Pallete.primaryColor,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-        ),
         onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

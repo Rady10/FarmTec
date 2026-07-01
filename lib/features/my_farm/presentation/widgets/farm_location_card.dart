@@ -1,14 +1,17 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/map/field_boundary.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/map/satellite_map_tiles.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/services/agromonitoring_client.dart';
 import 'package:farmtec/core/services/ndvi_service.dart';
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/widgets/farm_marker_icon.dart';
 import 'package:farmtec/features/farm/domain/entities/farm.dart';
+import 'package:farmtec/features/my_farm/presentation/screens/full_map_screen.dart';
 import 'package:farmtec/features/my_farm/presentation/widgets/my_farm_card_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -33,9 +36,37 @@ class FarmLocationCard extends StatefulWidget {
 }
 
 class _FarmLocationCardState extends State<FarmLocationCard> {
+  static const _mapHeight = 185.0;
+
+  final MapController _mapController = MapController();
+
   bool _showNDVI = false;
   bool _ndviLoading = false;
   NdviAnalysisResult? _ndviResult;
+
+  Color get _pillBg =>
+      widget.isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF0F2EE);
+
+  FieldBoundary get _fieldBoundary {
+    final hectares = FieldBoundary.parseHectares(widget.farm.area);
+    return FieldBoundary.fromCenter(
+      lat: widget.farm.lat,
+      lng: widget.farm.lng,
+      hectares: hectares,
+      orientationSeed: widget.farm.id,
+    );
+  }
+
+  List<Polygon> _fieldOverlay() {
+    return [
+      Polygon(
+        points: _fieldBoundary.drawRing,
+        color: const Color(0xFF7CB87C).withAlpha(95),
+        borderColor: Colors.white,
+        borderStrokeWidth: 2,
+      ),
+    ];
+  }
 
   List<Polygon> _ndviPolygons(NdviAnalysisResult result) {
     final fieldOutline = Polygon(
@@ -120,24 +151,82 @@ class _FarmLocationCardState extends State<FarmLocationCard> {
     }
   }
 
+  void _recenterMap() {
+    final center = LatLng(widget.farm.lat, widget.farm.lng);
+    _mapController.move(center, _mapController.camera.zoom);
+  }
+
+  String _coordsText(AppLocalizations l) {
+    final lat = widget.farm.lat.toStringAsFixed(4);
+    final lng = widget.farm.lng.toStringAsFixed(4);
+    return l.trParams('coords_short_format', {
+      'lat': l.convertNumbers(lat),
+      'lng': l.convertNumbers(lng),
+    });
+  }
+
+  Widget _actionPill({
+    required VoidCallback? onTap,
+    required Widget child,
+    bool active = false,
+  }) {
+    return Material(
+      color: active ? Pallete.primary : _pillBg,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final hasCoords = widget.farm.lat != 0 || widget.farm.lng != 0;
     final center = LatLng(widget.farm.lat, widget.farm.lng);
 
+    if (!hasCoords) return const SizedBox.shrink();
+
     return Container(
       decoration: myFarmCardDecoration(widget.isDark, widget.cardColor),
-      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (hasCoords)
-            SizedBox(
-              height: 180,
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_rounded,
+                size: 18,
+                color: Pallete.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l.tr('location'),
+                style: AppFonts.font(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: widget.textColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: SizedBox(
+              height: _mapHeight,
               width: double.infinity,
               child: Stack(
                 children: [
                   FlutterMap(
+                    mapController: _mapController,
                     options: MapOptions(
                       initialCenter: center,
                       initialZoom: 14,
@@ -148,37 +237,16 @@ class _FarmLocationCardState extends State<FarmLocationCard> {
                     children: [
                       ...SatelliteMapTiles.layers(),
                       if (_showNDVI && _ndviResult != null)
-                        PolygonLayer(
-                          polygons: _ndviPolygons(_ndviResult!),
-                        ),
+                        PolygonLayer(polygons: _ndviPolygons(_ndviResult!))
+                      else
+                        PolygonLayer(polygons: _fieldOverlay()),
                       MarkerLayer(
                         markers: [
                           Marker(
                             point: center,
-                            width: 40,
-                            height: 40,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Pallete.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(60),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.agriculture_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
+                            width: 36,
+                            height: 36,
+                            child: const FarmMarkerIcon(size: 36, iconSize: 18),
                           ),
                         ],
                       ),
@@ -192,12 +260,12 @@ class _FarmLocationCardState extends State<FarmLocationCard> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const CircularProgressIndicator(color: Colors.white),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             Text(
                               l.tr('ndvi_analyzing'),
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -211,246 +279,180 @@ class _FarmLocationCardState extends State<FarmLocationCard> {
                     child: IgnorePointer(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 3,
+                          horizontal: 5,
+                          vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(150),
+                          color: Colors.black.withAlpha(140),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           l.tr('map_satellite_attribution'),
-                          style: GoogleFonts.manrope(
-                            fontSize: 8,
+                          style: AppFonts.font(
+                            fontSize: 7,
                             color: Colors.white70,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            widget.cardColor.withAlpha(0),
-                            widget.cardColor,
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   if (_showNDVI && _ndviResult != null)
                     Positioned(
-                      top: 10,
-                      left: 10,
+                      top: 8,
+                      left: 8,
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: widget.cardColor.withAlpha(220),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l.trParams(
-                                'ndvi_scan_result',
-                                {
-                                  'value': l.convertNumbers(
-                                    _ndviResult!.averageNdvi.toStringAsFixed(2),
-                                  ),
-                                },
+                        child: Text(
+                          l.trParams(
+                            'ndvi_scan_result',
+                            {
+                              'value': l.convertNumbers(
+                                _ndviResult!.averageNdvi.toStringAsFixed(2),
                               ),
-                              style: GoogleFonts.manrope(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: widget.textColor,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 10,
-                                  height: 10,
-                                  color: const Color(0xFF4CAF50),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l.tr('ndvi_healthy'),
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 10,
-                                    color: widget.textColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 10,
-                                  height: 10,
-                                  color: const Color(0xFFF44336),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l.tr('ndvi_stressed'),
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 10,
-                                    color: widget.textColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                            },
+                          ),
+                          style: AppFonts.font(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: widget.textColor,
+                          ),
                         ),
                       ),
                     ),
                 ],
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: widget.isDark
-                        ? Pallete.darkSurfaceVariant
-                        : const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.satellite_alt_rounded,
-                    color: Pallete.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l.tr('gps_coordinates'),
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: widget.textColor,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Material(
+                      color: _pillBg,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        onTap: _recenterMap,
+                        customBorder: const CircleBorder(),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(
+                            Icons.gps_fixed_rounded,
+                            size: 16,
+                            color: Pallete.primary,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l.isArabic
-                            ? l.trParams('lat_lng_format_ar', {
-                                'lat': l.convertNumbers(
-                                  widget.farm.lat.toStringAsFixed(4),
-                                ),
-                                'lng': l.convertNumbers(
-                                  widget.farm.lng.toStringAsFixed(4),
-                                ),
-                              })
-                            : l.trParams('lat_lng_format', {
-                                'lat': widget.farm.lat.toStringAsFixed(4),
-                                'lng': widget.farm.lng.toStringAsFixed(4),
-                              }),
-                        style: GoogleFonts.manrope(
-                          fontSize: 11,
-                          color: widget.subColor,
-                        ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l.tr('location_coordinates'),
+                            style: AppFonts.font(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: widget.subColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _coordsText(l),
+                            style: AppFonts.font(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Pallete.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _ndviLoading ? null : _onNdviTap,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _showNDVI
-                          ? Pallete.primary
-                          : (widget.isDark
-                              ? Pallete.darkSurfaceVariant
-                              : const Color(0xFFE0E0E0)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: _ndviLoading
+              ),
+              const SizedBox(width: 8),
+              _actionPill(
+                onTap: _ndviLoading ? null : _onNdviTap,
+                active: _showNDVI,
+                child:
+                    _ndviLoading
                         ? const SizedBox(
-                            width: 36,
-                            height: 14,
-                            child: Center(
-                              child: SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
+                          width: 52,
+                          height: 14,
+                          child: Center(
+                            child: SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Pallete.primary,
                               ),
                             ),
-                          )
-                        : Text(
-                            'NDVI',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: _showNDVI ? Colors.white : widget.subColor,
+                          ),
+                        )
+                        : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.eco_rounded,
+                              size: 13,
+                              color: _showNDVI ? Colors.white : Pallete.primary,
                             ),
-                          ),
-                  ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'NDVI',
+                              style: AppFonts.font(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color:
+                                    _showNDVI ? Colors.white : Pallete.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+              ),
+              const SizedBox(width: 8),
+              _actionPill(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => FullMapScreen(farm: widget.farm),
+                    ),
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.open_in_new_rounded,
+                      size: 14,
+                      color: Pallete.primary,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      l.tr('view_map'),
+                      style: AppFonts.font(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Pallete.primary,
+                      ),
+                    ),
+                  ],
                 ),
-                if (_showNDVI && _ndviResult != null) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF22C55E).withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF22C55E),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l.tr('live'),
-                          style: GoogleFonts.manrope(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF22C55E),
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

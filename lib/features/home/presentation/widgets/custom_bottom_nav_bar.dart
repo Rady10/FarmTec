@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/home/presentation/widgets/nav_button.dart';
 import 'package:farmtec/features/home/presentation/widgets/nav_item.dart';
@@ -18,10 +19,11 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
     final l = AppLocalizations.of(context);
     final bottomPad = MediaQuery.of(context).padding.bottom;
-    final barBg = isDark ? Pallete.darkSurface : const Color(0xFF1B4332);
+    final barBg = colors.card;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPad + 12),
@@ -29,26 +31,30 @@ class CustomBottomNavBar extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              height: 64,
+              height: 68,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
               decoration: BoxDecoration(
                 color: barBg,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: barBg.withAlpha(80),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withAlpha(isDark ? 50 : 18),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(navItems.length, (i) {
-                  return NavButton(
-                    item: navItems[i],
-                    label: l.tr(navItems[i].key),
-                    isActive: i == currentIndex,
-                    onTap: () => onIndexChanged(i),
+                  final item = navItems[i];
+                  return Expanded(
+                    child: NavButton(
+                      item: item,
+                      label: l.tr(item.key),
+                      isActive: i == currentIndex,
+                      isDark: isDark,
+                      onTap: () => onIndexChanged(i),
+                    ),
                   );
                 }),
               ),
@@ -58,20 +64,16 @@ class CustomBottomNavBar extends StatelessWidget {
           GestureDetector(
             onTap: onChatPressed,
             child: Container(
-              width: 54,
-              height: 54,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Pallete.primary, Color(0xFF2D6A4F)],
-                ),
-                borderRadius: BorderRadius.circular(18),
+                color: isDark ? Pallete.chartGreen : Pallete.primary,
+                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Pallete.primary.withAlpha(80),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
+                    color: Pallete.primary.withAlpha(60),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),

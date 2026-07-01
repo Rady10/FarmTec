@@ -1,4 +1,6 @@
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/profile/presentation/widgets/support_info_data.dart';
 import 'package:farmtec/features/profile/presentation/widgets/support_info_section_card.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +20,14 @@ class SupportInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Pallete.darkBackground : Pallete.background;
-    final cardColor = isDark ? Pallete.darkCard : Colors.white;
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
-    final data = SupportInfoData.forPage(page);
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+    final bgColor = colors.background;
+    final cardColor = colors.card;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
+    final l = AppLocalizations.of(context);
+    final data = SupportInfoData.forPage(page, l);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -33,7 +37,7 @@ class SupportInfoScreen extends StatelessWidget {
         foregroundColor: textColor,
         title: Text(
           data.title,
-          style: GoogleFonts.manrope(fontSize: 18, fontWeight: FontWeight.w800),
+          style: AppFonts.font(fontSize: 18, fontWeight: FontWeight.w800),
         ),
       ),
       body: ListView(
@@ -67,7 +71,7 @@ class SupportInfoScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 Text(
                   data.heading,
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                     color: textColor,
@@ -76,7 +80,7 @@ class SupportInfoScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   data.summary,
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 13,
                     height: 1.5,
                     color: subColor,

@@ -1,7 +1,8 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/services/notification_settings_service.dart';
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/notifications/presentation/widgets/notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,18 +32,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
     final notifService = Provider.of<AppNotificationService>(context);
     final settings = Provider.of<NotificationSettingsService>(context);
     final items = notifService.notifications;
-    final bgColor = isDark ? Pallete.darkBackground : Pallete.background;
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
+    final bgColor = colors.background;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: isDark ? Pallete.darkCard : Pallete.surface,
+        backgroundColor: colors.card,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: textColor),
@@ -50,7 +51,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         title: Text(
           l.tr('notifications'),
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: textColor,
@@ -64,7 +65,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             },
             child: Text(
               l.tr('clear_all'),
-              style: GoogleFonts.manrope(
+              style: AppFonts.font(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: subColor,
@@ -79,7 +80,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 settings.pushEnabled
                     ? l.tr('no_notifications_match')
                     : l.tr('notifications_off'),
-                style: GoogleFonts.manrope(
+                style: AppFonts.font(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: subColor,

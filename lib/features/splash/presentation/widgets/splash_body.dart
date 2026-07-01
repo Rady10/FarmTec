@@ -1,3 +1,6 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/splash/presentation/widgets/splash_particles.dart';
 import 'package:farmtec/core/services/preferences_service.dart';
@@ -96,10 +99,12 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Pallete.darkBackground : Pallete.background;
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.secondary;
+    final l = AppLocalizations.of(context);
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
+    final bgColor = colors.background;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
 
     return AnimatedBuilder(
       animation: Listenable.merge([_mainCtrl, _pulseCtrl, _particleCtrl]),
@@ -202,8 +207,8 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
                         child: Opacity(
                           opacity: _titleSlide.value,
                           child: Text(
-                            'FarmTec',
-                            style: GoogleFonts.manrope(
+                            l.tr('app_name'),
+                            style: AppFonts.font(
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
                               color: textColor,
@@ -221,8 +226,8 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
                         child: Opacity(
                           opacity: _subtitleSlide.value,
                           child: Text(
-                            'Precision Intelligence',
-                            style: GoogleFonts.manrope(
+                            l.tr('precision_intelligence'),
+                            style: AppFonts.font(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: subColor,
@@ -249,8 +254,7 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
                           child: LinearProgressIndicator(
                             value: _mainCtrl.value,
                             minHeight: 3,
-                            backgroundColor:
-                                isDark ? Pallete.darkOutline : Pallete.outline,
+                            backgroundColor: colors.outline,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               Pallete.chartGreen,
                             ),
@@ -258,10 +262,10 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Loading your farm data...',
-                          style: GoogleFonts.manrope(
+                          l.tr('loading_farm_data'),
+                          style: AppFonts.font(
                             fontSize: 12,
-                            color: Pallete.textHint,
+                            color: colors.textHint,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

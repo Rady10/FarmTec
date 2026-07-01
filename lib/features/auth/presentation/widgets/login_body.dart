@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/utils/assets.dart';
 import 'package:farmtec/features/auth/presentation/screens/signup_screen.dart';
@@ -72,7 +73,7 @@ class _LoginBodyState extends State<LoginBody>
                         // Header
                         Text(
                           l.tr('welcome_back'),
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
                             color: textColor,
@@ -82,7 +83,7 @@ class _LoginBodyState extends State<LoginBody>
                         const SizedBox(height: 8),
                         Text(
                           l.tr('sign_in_subtitle'),
-                          style: GoogleFonts.manrope(
+                          style: AppFonts.font(
                             fontSize: 15,
                             color: subColor,
                             height: 1.5,
@@ -116,7 +117,7 @@ class _LoginBodyState extends State<LoginBody>
                                     onTap: () {},
                                     child: Text(
                                       l.tr('forgot_password'),
-                                      style: GoogleFonts.manrope(
+                                      style: AppFonts.font(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
                                         color: Pallete.accent,
@@ -178,7 +179,7 @@ class _LoginBodyState extends State<LoginBody>
                               children: [
                                 Text(
                                   l.tr('login_button'),
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -204,7 +205,7 @@ class _LoginBodyState extends State<LoginBody>
                                   const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
                                 l.tr('or'),
-                                style: GoogleFonts.manrope(
+                                style: AppFonts.font(
                                   fontSize: 13,
                                   color: Pallete.textHint,
                                 ),
@@ -253,7 +254,7 @@ class _LoginBodyState extends State<LoginBody>
                               children: [
                                 Text(
                                   l.tr('no_account'),
-                                  style: GoogleFonts.manrope(
+                                  style: AppFonts.font(
                                     fontSize: 14,
                                     color: subColor,
                                   ),
@@ -267,7 +268,7 @@ class _LoginBodyState extends State<LoginBody>
                                   },
                                   child: Text(
                                     l.tr('sign_up'),
-                                    style: GoogleFonts.manrope(
+                                    style: AppFonts.font(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: Pallete.accent,
@@ -305,7 +306,7 @@ class _LoginBodyState extends State<LoginBody>
         const SizedBox(width: 10),
         Text(
           'FarmTec',
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
@@ -318,7 +319,7 @@ class _LoginBodyState extends State<LoginBody>
   Widget _label(String text, Color color) {
     return Text(
       text,
-      style: GoogleFonts.manrope(
+      style: AppFonts.font(
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: color,
@@ -339,10 +340,10 @@ class _LoginBodyState extends State<LoginBody>
     return TextFormField(
       obscureText: obscure,
       keyboardType: type,
-      style: GoogleFonts.manrope(fontSize: 15, color: textColor),
+      style: AppFonts.font(fontSize: 15, color: textColor),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.manrope(fontSize: 15, color: Pallete.textHint),
+        hintStyle: AppFonts.font(fontSize: 15, color: Pallete.textHint),
         filled: true,
         fillColor: fillColor,
         suffixIcon: suffix,
@@ -386,7 +387,7 @@ class _LoginBodyState extends State<LoginBody>
           const SizedBox(width: 8),
           Text(
             label,
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: textColor,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 
 class FarmSectionLabel extends StatelessWidget {
   final IconData icon;
@@ -14,18 +15,21 @@ class FarmSectionLabel extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 7),
-          Text(
-            title,
-            style: GoogleFonts.manrope(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: colors.iconAccent),
+        const SizedBox(width: 7),
+        Text(
+          title,
+          style: AppFonts.font(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: color,
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }

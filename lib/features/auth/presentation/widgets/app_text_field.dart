@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,10 +32,10 @@ class AppTextField extends StatelessWidget {
     return TextFormField(
       obscureText: obscure,
       keyboardType: type,
-      style: GoogleFonts.manrope(fontSize: 14, color: textColor),
+      style: AppFonts.font(fontSize: 14, color: textColor),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.manrope(fontSize: 14, color: Pallete.textHint),
+        hintStyle: AppFonts.font(fontSize: 14, color: Pallete.textHint),
         filled: true,
         fillColor: fillColor,
         suffixIcon: suffix,

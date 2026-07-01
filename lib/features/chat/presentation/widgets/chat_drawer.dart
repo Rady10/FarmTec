@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/chat/data/models/chat_message.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class ChatDrawer extends StatelessWidget {
                   const SizedBox(width: 10),
                   Text(
                     l.tr('farmbrain_ai'),
-                    style: GoogleFonts.manrope(
+                    style: AppFonts.font(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -83,7 +84,7 @@ class ChatDrawer extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text(
                         l.tr('new_chat'),
-                        style: GoogleFonts.manrope(
+                        style: AppFonts.font(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -99,7 +100,7 @@ class ChatDrawer extends StatelessWidget {
               padding: const EdgeInsets.only(left: 20),
               child: Text(
                 l.tr('chat_history'),
-                style: GoogleFonts.manrope(
+                style: AppFonts.font(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: Colors.white54,
@@ -147,7 +148,7 @@ class ChatDrawer extends StatelessWidget {
                               preview,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 fontSize: 13,
                                 color: isActive ? Colors.white : Colors.white70,
                                 fontWeight: isActive

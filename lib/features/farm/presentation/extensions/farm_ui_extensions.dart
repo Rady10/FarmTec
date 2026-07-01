@@ -1,5 +1,7 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/features/farm/domain/entities/farm.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 extension FarmUiExtensions on Farm {
   Color get healthColor {
@@ -33,5 +35,11 @@ extension FarmUiExtensions on Farm {
       default:
         return Icons.check_circle_rounded;
     }
+  }
+
+  String formatPlantingDate(AppLocalizations l) {
+    if (plantedAt == null) return l.tr('no_planting_date');
+    final locale = l.isArabic ? 'ar' : 'en';
+    return l.convertNumbers(DateFormat.yMMMd(locale).format(plantedAt!));
   }
 }

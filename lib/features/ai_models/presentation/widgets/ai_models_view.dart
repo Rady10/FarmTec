@@ -1,10 +1,9 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
-import 'package:farmtec/core/themes/pallete.dart';
-import 'package:farmtec/features/ai_models/presentation/widgets/ai_engine_banner.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AIModelsView extends StatelessWidget {
   const AIModelsView({super.key});
@@ -14,7 +13,7 @@ class AIModelsView extends StatelessWidget {
       name: 'Crop Recommendation',
       desc: 'Predicts optimal crop based on GPS location',
       icon: Icons.eco_rounded,
-      color: Color(0xFF4CAF50),
+      backgroundImage: 'assets/images/crop_rec.png',
       apiUrl: 'https://youssef-d1aa-croprecommend.hf.space/predict',
       fields: [
         AIModelFieldDefinition(
@@ -35,7 +34,7 @@ class AIModelsView extends StatelessWidget {
       name: 'Yield Prediction',
       desc: 'Forecasts crop yield from location, year & crop type',
       icon: Icons.bar_chart_rounded,
-      color: Color(0xFFFF9800),
+      backgroundImage: 'assets/images/yield.png',
       apiUrl: 'https://youssef-d1aa-yieldpredict.hf.space/predict_yield',
       fields: [
         AIModelFieldDefinition(
@@ -68,7 +67,7 @@ class AIModelsView extends StatelessWidget {
       name: 'Irrigation Planner',
       desc: 'Calculates irrigation needs from GPS coordinates',
       icon: Icons.water_rounded,
-      color: Color(0xFF03A9F4),
+      backgroundImage: 'assets/images/irri.png',
       apiUrl: 'https://B1R-14N15-irrigation.hf.space/predict',
       fields: [
         AIModelFieldDefinition(
@@ -89,7 +88,7 @@ class AIModelsView extends StatelessWidget {
       name: 'Market Forecast',
       desc: 'Commodity price forecast from live market data',
       icon: Icons.show_chart_rounded,
-      color: Color(0xFF9C27B0),
+      backgroundImage: 'assets/images/prices.png',
       apiUrl: 'https://b1r-14n15-forecast.hf.space/forecast',
       fields: [],
     ),
@@ -97,89 +96,152 @@ class AIModelsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
     final l = AppLocalizations.of(context);
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
-    final cardColor = isDark ? Pallete.darkCard : Colors.white;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
+    final cardColor = colors.card;
+    final bgColor = colors.background;
+    const heroHeight = 200.0;
+    final topPadding = MediaQuery.of(context).padding.top;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Stack(
+      children: [
+        // Keep status bar / notch clear of the hero image.
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: topPadding,
+          child: ColoredBox(color: bgColor),
+        ),
+        Positioned(
+          top: topPadding,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: heroHeight,
+            child: Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.hardEdge,
+              children: [
+                Image.asset(
+                  'assets/images/models_illus.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.bottomCenter,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.black.withAlpha(100)
+                        : Colors.white.withAlpha(30),
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 48,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          bgColor,
+                          bgColor.withAlpha(0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          bgColor.withAlpha(0),
+                          bgColor,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 100),
+          child: Column(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l.tr('ai_models'),
-                      style: GoogleFonts.manrope(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: textColor,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Icon(
+                      Icons.eco_rounded,
+                      size: 18,
+                      color: context.screenHeaderTitle.withAlpha(180),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    children: [
+                      Text(
+                        l.tr('ai_models'),
+                        style: AppFonts.font(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: context.screenHeaderTitle,
+                          height: 1.2,
+                        ),
                       ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l.tr('tap_model_subtitle'),
+                        style: AppFonts.font(
+                          fontSize: 12,
+                          color: context.screenHeaderSubtitle,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Icon(
+                      Icons.eco_rounded,
+                      size: 18,
+                      color: context.screenHeaderTitle.withAlpha(180),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      l.tr('tap_model_subtitle'),
-                      style: GoogleFonts.manrope(fontSize: 13, color: subColor),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF22C55E),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      l.isArabic
-                          ? '${_models.length} نشط'
-                          : '${_models.length} LIVE',
-                      style: GoogleFonts.manrope(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 72),
+              ...List.generate(
+                _models.length,
+                (i) => AiModelTile(
+                  model: _models[i],
+                  isDark: isDark,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subColor: subColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          AiEngineBanner(isDark: isDark),
-          const SizedBox(height: 24),
-          ...List.generate(
-            _models.length,
-            (i) => AiModelTile(
-              model: _models[i],
-              isDark: isDark,
-              cardColor: cardColor,
-              textColor: textColor,
-              subColor: subColor,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

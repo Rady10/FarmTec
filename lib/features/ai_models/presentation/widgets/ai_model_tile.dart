@@ -1,4 +1,6 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/ai_models/presentation/screens/ai_model_run_screen.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ class AiModelTile extends StatelessWidget {
   final Color cardColor;
   final Color textColor;
   final Color subColor;
+  final bool isNew;
 
   const AiModelTile({
     super.key,
@@ -18,94 +21,182 @@ class AiModelTile extends StatelessWidget {
     required this.cardColor,
     required this.textColor,
     required this.subColor,
+    this.isNew = false,
   });
+
+  /// Unique accent color per model icon background
+  Color get _iconBgColor {
+    switch (model.icon) {
+      case Icons.eco_rounded:
+        return const Color(0xFF2D6A4F); // green
+      case Icons.bar_chart_rounded:
+        return const Color(0xFF1565C0); // blue
+      case Icons.water_rounded:
+        return const Color(0xFF00897B); // teal
+      case Icons.show_chart_rounded:
+        return const Color(0xFF2E7D32); // dark green
+      default:
+        return Pallete.primary;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final nameKey = model.name.toLowerCase().replaceAll(' ', '_');
+    final descKey = '${nameKey}_desc';
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => AiModelRunScreen(model: model)),
       ),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 14),
+        height: 130,
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 25 : 10),
-              blurRadius: 12,
+              color: Colors.black.withAlpha(isDark ? 50 : 18),
+              blurRadius: 16,
               offset: const Offset(0, 4),
             ),
           ],
         ),
+        clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: model.color.withAlpha(25),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(model.icon, color: model.color, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // ── Left: image thumbnail ──────────────────────────────────
+            SizedBox(
+              width: 115,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Text(
-                    l.tr(model.name.toLowerCase().replaceAll(' ', '_')),
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: textColor,
-                    ),
+                  Image.asset(
+                    model.backgroundImage,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        Container(color: Pallete.primary.withAlpha(30)),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l.tr('${model.name.toLowerCase().replaceAll(' ', '_')}_desc'),
-                    style: GoogleFonts.manrope(
-                      fontSize: 11,
-                      color: subColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(Icons.api_rounded, size: 12, color: subColor),
-                      const SizedBox(width: 4),
-                      Text(
-                        model.fields.isEmpty
-                            ? (l.isArabic ? 'طلب GET' : 'GET request')
-                            : (l.isArabic
-                                ? '${model.fields.length} معلمات'
-                                : '${model.fields.length} parameters'),
-                        style: GoogleFonts.manrope(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: subColor,
+                  // "New" badge
+                  if (isNew)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withAlpha(200)
+                              : Colors.white.withAlpha(230),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(30),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          l.tr('new_badge'),
+                          style: AppFonts.font(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: Pallete.primary,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
                 ],
               ),
             ),
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: model.color.withAlpha(20),
-                borderRadius: BorderRadius.circular(10),
+
+            // ── Right: text content + icon ─────────────────────────────
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 14, 10, 14),
+                child: Row(
+                  children: [
+                    // Text column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l.tr(nameKey),
+                            style: AppFonts.font(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: textColor,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l.tr(descKey),
+                            style: AppFonts.font(
+                              fontSize: 11,
+                              color: subColor,
+                              height: 1.4,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Spacer(),
+                          // Parameters info row
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.settings_rounded,
+                                size: 12,
+                                color: subColor.withAlpha(180),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                model.fields.isEmpty
+                                    ? l.tr('get_request')
+                                    : l.trParams('parameters_count', {
+                                        'count': '${model.fields.length}',
+                                      }),
+                                style: AppFonts.font(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: subColor.withAlpha(180),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Icon badge
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: _iconBgColor.withAlpha(isDark ? 50 : 25),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        model.icon,
+                        color: _iconBgColor,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Icon(Icons.play_arrow_rounded, color: model.color, size: 20),
             ),
           ],
         ),

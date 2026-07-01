@@ -1,3 +1,6 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/themes/text_styles.dart';
 import 'package:farmtec/features/onboarding/data/onboarding_page_model.dart';
@@ -14,22 +17,25 @@ class PageViewItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final colors = context.appColors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         OnboardingImageCard(model: model),
         const SizedBox(height: 28),
         if (model.tagLabel != null) ...[
-          OnboardingTagChip(label: model.tagLabel!),
+          OnboardingTagChip(label: l.tr(model.tagLabel!)),
           const SizedBox(height: 14),
         ],
         Text(
-          model.title,
+          l.tr(model.title),
           textAlign: TextAlign.center,
-          style: GoogleFonts.manrope(
+          style: AppFonts.font(
             fontSize: 30,
             fontWeight: FontWeight.w800,
-            color: Pallete.primaryColor,
+            color: colors.textPrimary,
             height: 1.2,
             letterSpacing: -0.5,
           ),
@@ -38,12 +44,12 @@ class PageViewItem extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Text(
-            model.subtitle,
+            l.tr(model.subtitle),
             textAlign: TextAlign.center,
             style: TextStyles.bodyMedium.copyWith(
               fontSize: 15,
               height: 1.6,
-              color: const Color(0xFF6B7280),
+              color: colors.textTertiary,
             ),
           ),
         ),

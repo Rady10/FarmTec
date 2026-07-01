@@ -29,6 +29,8 @@ class AppLocalizations {
       // ── App ──
       'app_name': 'FarmTec',
       'tagline': 'Precision Intelligence for the Modern Farm',
+      'precision_intelligence': 'Precision Intelligence',
+      'loading_farm_data': 'Loading your farm data...',
 
       // ── Auth ──
       'welcome_back': 'Welcome Back',
@@ -96,6 +98,7 @@ class AppLocalizations {
       'wind': 'Wind',
       'soil_temp': 'Soil Temp',
       'optimal': 'Optimal',
+      'medium': 'Medium',
       'for_growth': 'FOR GROWTH',
       'apply_now': 'Apply Now',
       'schedule': 'Schedule',
@@ -144,13 +147,27 @@ class AppLocalizations {
       'connected_to_api': 'Connected to HuggingFace APIs',
       'get_request': 'GET request',
       'parameters': 'parameters',
+      'stat_accuracy': 'Accuracy',
+      'stat_speed': 'Speed',
+      'stat_runs': 'Runs',
 
       // ── Market ──
       'market_prices': 'Market Prices',
       'market_subtitle': 'Live commodity prices · Updated every 15 min',
+      'all_commodities': 'All Commodities',
+      'crops': 'Crops',
+      'fruits': 'Fruits',
+      'vegetables': 'Vegetables',
+      'grains': 'Grains',
+      'sort': 'Sort',
+      'sort_default': 'Default',
+      'sort_price_high': 'Price: High to Low',
+      'sort_price_low': 'Price: Low to High',
+      'sort_change_high': 'Highest Gainers',
       'forecast_details': 'Forecast Details',
       'current_price': 'Current Price',
       'failed_to_load_market': 'Failed to load market prices.',
+      'no_market_for_crop': 'No market price available for {crop} right now.',
       'per_ton': '/t',
       'wheat': 'Wheat',
       'maize': 'Maize',
@@ -183,9 +200,14 @@ class AppLocalizations {
       'add_new_field': 'Add New Field',
       'field_added': '✅ Field added!',
       'no_farm_selected': 'No farm selected',
-      'farm_details': 'Current farm details & overview',
+      'farm_details': 'Your farm details in one place',
       'farm_overview': 'Farm Overview',
       'location': 'Location',
+      'view_map': 'View on Map',
+      'view_map_btn': 'View Map',
+      'change_crop': 'Change Crop',
+      'location_coordinates': 'Location Coordinates',
+      'coords_short_format': '{lat} , {lng}',
       'no_recent_activity': 'No recent activity',
       'health': 'Health',
       'last_scan': 'Last Scan',
@@ -217,6 +239,7 @@ class AppLocalizations {
       'lat_lng_format_ar': 'Lat: {lat} · Lng: {lng}',
       'planting_date': 'Planting Date',
       'select_planting_date': 'Select planting date',
+      'no_planting_date': 'Not set',
       'crop_lifecycle': 'Crop Lifecycle',
       'profit_calculator': 'Profit Calculator',
       'estimated_yield': 'Estimated Yield',
@@ -240,7 +263,7 @@ class AppLocalizations {
       'time_ago_minutes': '{n}m ago',
       'time_ago_hours': '{h}h ago',
       'time_ago_days': '{d}d ago',
-      'task_automation': 'Task Automation',
+      'task_automation': 'Next Tasks',
       'location_fetch_failed': 'Failed to get location',
       'year': 'Year',
       'notifications_off': 'Notifications are turned off.',
@@ -306,11 +329,186 @@ class AppLocalizations {
       'failed_to_load': 'Failed to load data',
       'synchronizing': 'SYNCHRONIZING SOIL DATA',
       'version': '@FarmTec v2.0',
+
+      // ── Onboarding ──
+      'skip': 'Skip',
+      'next': 'Next',
+      'get_started': 'Get Started',
+      'skip_onboarding': 'Skip Onboarding',
+      'onboarding_title_1': 'Maximize Your Profits',
+      'onboarding_subtitle_1':
+          'Real-time market tracking and AI-driven price forecasting to help you sell at the optimal moment.',
+      'onboarding_label_veg_index': 'VEGETATION INDEX',
+      'onboarding_val_veg_index': '0.82 NDVI',
+      'onboarding_sub_veg_index': '+4% vs last scan',
+      'onboarding_label_light_exp': 'LIGHT EXPOSURE',
+      'onboarding_val_light_exp': '94%',
+      'onboarding_title_2': 'AI-Powered\nInsights',
+      'onboarding_subtitle_2':
+          'Upload photos of your crops for instant disease detection and nutrient analysis.',
+      'onboarding_label_status': 'STATUS',
+      'onboarding_val_status_progress': 'Analysis in Progress...',
+      'onboarding_label_detection': 'DETECTION',
+      'onboarding_val_confidence': '98.4% Confidence',
+      'onboarding_title_3': 'Optimize\nEvery Drop',
+      'onboarding_subtitle_3':
+          'Automated irrigation plans that adjust based on weather forecasts and soil moisture levels.',
+      'onboarding_tag_smart_irrigation': 'SMART IRRIGATION',
+      'onboarding_label_moisture': 'MOISTURE',
+      'onboarding_val_moisture': '68%',
+      'onboarding_label_forecast': 'FORECAST',
+      'onboarding_val_forecast_rain': 'Rain 2pm',
+      'onboarding_feat_title_scaling': 'Predictive Scaling',
+      'onboarding_feat_desc_scaling':
+          'Systems scale water use 12 hours before rain events.',
+
+      // ── Units & Measures ──
+      'ppm': 'ppm',
+      'ha': 'ha',
+      'seconds_abbr': 's',
+      'thousands_abbr': 'K',
+
+      // ── Extra Dashboard ──
+      'ai_reco_apply_urea':
+          'Apply 15 kg/ha of Urea to {farm} for optimal nitrogen before next rainfall.',
+      'precipitation_value': '{value}mm',
+      'wind_value': '{value} km/h',
+      'temp_value': '{value}°C',
+      'soil_temp_value': '{value}°C',
+      'forecast_5day': '5-Day Forecast',
+      'weather_unavailable': 'Weather unavailable',
+      'alert': 'Alert',
+      'monitor': 'Monitor',
+      'nitrogen_n': 'Nitrogen (N)',
+      'phosphorus_p': 'Phosphorus (P)',
+      'potassium_k': 'Potassium (K)',
+      'ph_level': 'pH Level',
+
+      // ── Extra AI Models ──
+      'parameters_count': '{count} parameters',
+      'models_live_count': '{count} LIVE',
+      'recommended_crop': '🌾 Recommended: {crop}',
+      'yield_predicted': '📊 Yield: {yield} {unit}',
+      'irrigation_need': '💧 Need: {need}mm ({class})',
+
+      // ── Extra Chat ──
+      'chat_welcome':
+          "Hello! I'm FarmBrain, your AI agriculture assistant. How can I help you today?",
+      'new_conversation_started':
+          'New conversation started. How can I help you?',
+
+      // ── Extra Market ──
+      'per_ton_full': 'per ton',
+      'quarter_format': 'Q{quarter} {year}',
+
+      // ── Extra Profile ──
+      'profile_user_name': 'Ahmed Al-Rashid',
+      'profile_user_role': 'Senior Farm Manager · 8 years',
+      'north_region': 'North Region',
+
+      // ── Extra Support & FAQ ──
+      'help_faq_heading': 'How can we help?',
+      'help_faq_summary':
+          'Quick answers for the whole FarmTec app: dashboard, farms, AI models, NDVI, market data, notifications, profile, and account settings.',
+      'faq_sec_ndvi': 'Using NDVI',
+      'faq_sec_ndvi_line1':
+          'Open My Farm, select a field, then tap Run Scan to refresh the vegetation index.',
+      'faq_sec_ndvi_line2':
+          'Scores near 1.00 indicate strong plant vigor. Lower scores point to water, nutrient, or disease stress.',
+      'faq_sec_dash': 'Dashboard and profit',
+      'faq_sec_dash_line1':
+          'The dashboard summarizes weather, farm status, tasks, market context, and projected gross profit.',
+      'faq_sec_dash_line2':
+          'Profit uses the latest Yield Prediction model result, then multiplies it by the current market price.',
+      'faq_sec_ai': 'AI models',
+      'faq_sec_ai_line1':
+          'Open AI Models to run crop recommendation, disease detection, yield prediction, irrigation, weather, and nutrient tools.',
+      'faq_sec_ai_line2':
+          'Yield Prediction saves its latest result so the profit calculator can use the same number.',
+      'faq_sec_fields': 'Managing fields',
+      'faq_sec_fields_line1':
+          'Use Add Field to save a field name, crop, area, and GPS location.',
+      'faq_sec_fields_line2':
+          'Tap any field card to view crop lifecycle, soil readings, NDVI analysis, activity, and AI insights.',
+      'faq_sec_lifecycle': 'Crop lifecycle',
+      'faq_sec_lifecycle_line1':
+          'Lifecycle cards show stage windows and field actions for every available crop.',
+      'faq_sec_lifecycle_line2':
+          'Supported crops include Wheat, Maize, Rice, Tomato, Potato, Mango, Jowar (Sorghum), and Green Fodder.',
+      'faq_sec_market': 'Market and notifications',
+      'faq_sec_market_line1':
+          'Market shows commodity prices and forecast details for supported crops.',
+      'faq_sec_market_line2':
+          'Profile controls push notifications plus weather and market price alert categories.',
+      'faq_sec_alerts': 'Alerts and notifications',
+      'faq_sec_alerts_line1':
+          'Weather and market price alerts can be enabled or disabled from Profile.',
+      'faq_sec_alerts_line2':
+          'Critical field health should be inspected in person before applying treatment.',
+
+      'privacy_heading': 'Your farm data stays yours',
+      'privacy_summary':
+          'FarmTec uses account, field, and location data only to provide farm monitoring, recommendations, and app functionality.',
+      'privacy_sec_data': 'Data we use',
+      'privacy_sec_data_line1':
+          'Profile details, selected farms, crop information, field locations, and app preferences.',
+      'privacy_sec_data_line2':
+          'Location is used for maps, weather context, field boundaries, and vegetation analysis.',
+      'privacy_sec_protect': 'How data is protected',
+      'privacy_sec_protect_line1':
+          'Local preferences are stored on the device for faster access.',
+      'privacy_sec_protect_line2':
+          'We do not sell personal or farm data. Shared reports should be sent only to people you trust.',
+      'privacy_sec_choices': 'Your choices',
+      'privacy_sec_choices_line1':
+          'You can update profile details, change notification settings, or sign out from Profile.',
+      'privacy_sec_choices_line2':
+          'Remove saved farms when you no longer want them available in the app.',
+
+      'about_heading': 'Precision intelligence for farms',
+      'about_summary':
+          'FarmTec brings field monitoring, satellite-style vegetation analysis, market context, and AI guidance into one mobile workspace.',
+      'about_sec_build': 'What we build',
+      'about_sec_build_line1':
+          'Tools that help growers understand crop health, soil condition, irrigation needs, and market movement.',
+      'about_sec_build_line2':
+          'Simple field workflows that make data useful while work is happening.',
+      'about_sec_approach': 'Our approach',
+      'about_sec_approach_line1':
+          'Clear recommendations, practical metrics, and fast access from the farm dashboard.',
+      'about_sec_approach_line2':
+          'AI support is designed to assist decisions, not replace field inspection or agronomic judgment.',
+
+      'contact_heading': 'Talk to FarmTec support',
+      'contact_summary':
+          'Reach out for account help, field setup questions, product feedback, or partnership conversations.',
+      'contact_sec_support': 'Support',
+      'contact_sec_support_line1': 'Email: support@farmtec.io',
+      'contact_sec_support_line2': 'Phone: +20 100 000 0000',
+      'contact_sec_support_line3':
+          'Hours: Sunday to Thursday, 9:00 AM - 6:00 PM Cairo time.',
+      'contact_sec_when': 'When contacting us',
+      'contact_sec_when_line1':
+          'Include your farm name, field name, crop, and the screen where you saw the issue.',
+      'contact_sec_when_line2':
+          'For NDVI or map issues, include the field GPS location if available.',
+
+      // ── Extra Notifications ──
+      'market_update': 'Market Update',
+      'just_now': 'Just now',
+      'notif_market_changed':
+          'Wheat price changed to {price}/t. Review your selling strategy.',
+      'notif_market_up':
+          'Wheat price up 2.3% to \$287.50/t. Consider selling this week.',
+      'notif_weather_adjust':
+          'Significant temperature change expected tomorrow. Adjust irrigation accordingly.',
     },
     'ar': {
       // ── App ──
       'app_name': 'فارم تك',
       'tagline': 'ذكاء زراعي متقدّم لمزرعتك',
+      'precision_intelligence': 'ذكاء زراعي دقيق',
+      'loading_farm_data': 'جارِ تحميل بيانات المزرعة...',
 
       // ── Auth ──
       'welcome_back': 'مرحباً بعودتك',
@@ -376,6 +574,7 @@ class AppLocalizations {
       'wind': 'سرعة الرياح',
       'soil_temp': 'حرارة التربة',
       'optimal': 'مثالي',
+      'medium': 'متوسط',
       'for_growth': 'للنمو',
       'apply_now': 'تطبيق الآن',
       'schedule': 'جدولة',
@@ -423,13 +622,27 @@ class AppLocalizations {
       'connected_to_api': 'متصل بخوادم الذكاء الاصطناعي',
       'get_request': 'طلب تلقائي',
       'parameters': 'بيانات مطلوبة',
+      'stat_accuracy': 'الدقة',
+      'stat_speed': 'السرعة',
+      'stat_runs': 'التشغيلات',
 
       // ── Market ──
       'market_prices': 'أسعار المحاصيل',
       'market_subtitle': 'أسعار حية · تحديث كل ١٥ دقيقة',
+      'all_commodities': 'كل السلع',
+      'crops': 'محاصيل',
+      'fruits': 'فواكه',
+      'vegetables': 'خضروات',
+      'grains': 'حبوب',
+      'sort': 'ترتيب',
+      'sort_default': 'الافتراضي',
+      'sort_price_high': 'السعر: الأعلى للأقل',
+      'sort_price_low': 'السعر: الأقل للأعلى',
+      'sort_change_high': 'الأعلى تغيراً',
       'forecast_details': 'تفاصيل التوقعات',
       'current_price': 'السعر الحالي',
       'failed_to_load_market': 'فشل تحميل أسعار السوق.',
+      'no_market_for_crop': 'لا يتوفر سعر سوق لـ{crop} حالياً.',
       'per_ton': '/طن',
       'wheat': 'قمح',
       'maize': 'ذرة',
@@ -462,9 +675,14 @@ class AppLocalizations {
       'add_new_field': 'إضافة حقل جديد',
       'field_added': '✅ تمت الإضافة بنجاح!',
       'no_farm_selected': 'لم يتم اختيار مزرعة',
-      'farm_details': 'تفاصيل المزرعة الحالية',
+      'farm_details': 'تفاصيل مزرعتك في مكان واحد',
       'farm_overview': 'نظرة عامة على المزرعة',
       'location': 'الموقع',
+      'view_map': 'عرض على الخريطة',
+      'view_map_btn': 'عرض الخريطة',
+      'change_crop': 'تغيير المحصول',
+      'location_coordinates': 'إحداثيات الموقع',
+      'coords_short_format': '{lat} , {lng}',
       'no_recent_activity': 'لا يوجد نشاط حديث',
       'health': 'الحالة الصحية',
       'last_scan': 'آخر فحص',
@@ -496,6 +714,7 @@ class AppLocalizations {
       'lat_lng_format_ar': 'خط العرض: {lat} · خط الطول: {lng}',
       'planting_date': 'تاريخ الزراعة',
       'select_planting_date': 'اختر تاريخ الزراعة',
+      'no_planting_date': 'غير محدد',
       'crop_lifecycle': 'دورة حياة المحصول',
       'profit_calculator': 'حاسبة الأرباح',
       'estimated_yield': 'المحصول المقدر',
@@ -519,7 +738,7 @@ class AppLocalizations {
       'time_ago_minutes': 'منذ {n} دقيقة',
       'time_ago_hours': 'منذ {h} ساعة',
       'time_ago_days': 'منذ {d} يوم',
-      'task_automation': 'المهام الآلية',
+      'task_automation': 'المهام التالية',
       'location_fetch_failed': 'فشل الحصول على الموقع',
       'year': 'السنة',
       'notifications_off': 'الإشعارات معطّلة.',
@@ -584,6 +803,178 @@ class AppLocalizations {
       'failed_to_load': 'تعذّر تحميل البيانات',
       'synchronizing': 'جارِ مزامنة بيانات التربة',
       'version': '@فارم تك v2.0',
+
+      // ── Onboarding ──
+      'skip': 'تخطي',
+      'next': 'التالي',
+      'get_started': 'البدء',
+      'skip_onboarding': 'تخطي الترحيب',
+      'onboarding_title_1': 'ضاعف أرباحك',
+      'onboarding_subtitle_1':
+          'متابعة أسعار السوق مباشرة وتوقعات ذكية لمساعدتك في البيع في الوقت المثالي.',
+      'onboarding_label_veg_index': 'مؤشر الغطاء النباتي',
+      'onboarding_val_veg_index': '٠.٨٢ NDVI',
+      'onboarding_sub_veg_index': '+٤٪ مقارنة بالفحص الأخير',
+      'onboarding_label_light_exp': 'التعرض للضوء',
+      'onboarding_val_light_exp': '٩٤٪',
+      'onboarding_title_2': 'تحليلات مدعومة\nبالذكاء الاصطناعي',
+      'onboarding_subtitle_2':
+          'ارفع صور محاصيلك للتعرف الفوري على الأمراض وتحليل العناصر الغذائية.',
+      'onboarding_label_status': 'الحالة',
+      'onboarding_val_status_progress': 'جارِ التحليل...',
+      'onboarding_label_detection': 'التشخيص',
+      'onboarding_val_confidence': 'نسبة دقة ٩٨.٤٪',
+      'onboarding_title_3': 'استهلاك مثالي\nلكل قطرة',
+      'onboarding_subtitle_3':
+          'خطط ري ذكية تتكيف تلقائيًا مع توقعات الطقس ورطوبة التربة.',
+      'onboarding_tag_smart_irrigation': 'ري ذكي',
+      'onboarding_label_moisture': 'الرطوبة',
+      'onboarding_val_moisture': '٦٨٪',
+      'onboarding_label_forecast': 'التوقعات',
+      'onboarding_val_forecast_rain': 'مطر ٢ ظهراً',
+      'onboarding_feat_title_scaling': 'جدولة ذكية',
+      'onboarding_feat_desc_scaling':
+          'يقوم النظام بضبط كمية المياه قبل ١٢ ساعة من هطول المطر.',
+
+      // ── Units & Measures ──
+      'ppm': 'جزء في المليون',
+      'ha': 'هكتار',
+      'seconds_abbr': ' ث',
+      'thousands_abbr': ' ألف',
+
+      // ── Extra Dashboard ──
+      'ai_reco_apply_urea':
+          'ضع ١٥ كجم/هكتار من اليوريا لمزرعة {farm} للحصول على نيتروجين مثالي قبل هطول الأمطار القادم.',
+      'precipitation_value': '{value} ملم',
+      'wind_value': '{value} كم/س',
+      'temp_value': '{value}°م',
+      'soil_temp_value': '{value}°م',
+      'forecast_5day': 'توقعات الأيام القادمة',
+      'weather_unavailable': 'تعذّر تحميل الطقس',
+      'alert': 'تنبيه',
+      'monitor': 'راقب المزرعة',
+      'nitrogen_n': 'نيتروجين (N)',
+      'phosphorus_p': 'فوسفور (P)',
+      'potassium_k': 'بوتاسيوم (K)',
+      'ph_level': 'مستوى الحموضة (pH)',
+
+      // ── Extra AI Models ──
+      'parameters_count': '{count} معلمات',
+      'models_live_count': '{count} نشط',
+      'recommended_crop': '🌾 المحصول المقترح: {crop}',
+      'yield_predicted': '📊 المحصول المتوقع: {yield} {unit}',
+      'irrigation_need': '💧 الاحتياج: {need} ملم ({class})',
+
+      // ── Extra Chat ──
+      'chat_welcome':
+          'مرحباً! أنا فارم برين، مساعدك الذكي في الزراعة. كيف يمكنني مساعدتك اليوم؟',
+      'new_conversation_started': 'بدأت محادثة جديدة. كيف يمكنني مساعدتك؟',
+
+      // ── Extra Market ──
+      'per_ton_full': 'لكل طن',
+      'quarter_format': 'الربع {quarter} {year}',
+
+      // ── Extra Profile ──
+      'profile_user_name': 'أحمد الرشيد',
+      'profile_user_role': 'مدير مزرعة أول · ٨ سنوات',
+      'north_region': 'المنطقة الشمالية',
+
+      // ── Extra Support & FAQ ──
+      'help_faq_heading': 'كيف يمكننا مساعدتك؟',
+      'help_faq_summary':
+          'إجابات سريعة لكافة أقسام تطبيق فارم تك: لوحة التحكم، المزارع، نماذج الذكاء الاصطناعي، NDVI، بيانات السوق، الإشعارات، الملف الشخصي، وإعدادات الحساب.',
+      'faq_sec_ndvi': 'استخدام مؤشر NDVI',
+      'faq_sec_ndvi_line1':
+          'افتح صفحة "مزرعتي"، اختر حقلاً، ثم اضغط على "تشغيل الفحص" لتحديث مؤشر الغطاء النباتي.',
+      'faq_sec_ndvi_line2':
+          'القيم القريبة من ١.٠٠ تشير إلى نمو قوي وصحي للنبات. القيم الأقل تدل على نقص المياه، الغذاء، أو الإصابة بالآفات.',
+      'faq_sec_dash': 'لوحة التحكم وحساب الأرباح',
+      'faq_sec_dash_line1':
+          'تلخص لوحة التحكم حالة الطقس والمزرعة والمهام وأسعار السوق والربح الإجمالي المتوقع.',
+      'faq_sec_dash_line2':
+          'حساب الأرباح يعتمد على آخر نتيجة لتوقع المحصول ويضربها في سعر السوق الحالي للمحصول.',
+      'faq_sec_ai': 'نماذج الذكاء الاصطناعي',
+      'faq_sec_ai_line1':
+          'افتح صفحة "الذكاء الاصطناعي" لتشغيل نماذج التوصية بالمحاصيل، التعرف على الأمراض، وتوقعات الإنتاج والري والتسميد.',
+      'faq_sec_ai_line2':
+          'يقوم نموذج توقع الإنتاج بحفظ آخر نتيجة تلقائيًا لتستخدمها حاسبة الأرباح في لوحة التحكم.',
+      'faq_sec_fields': 'إدارة الحقول',
+      'faq_sec_fields_line1':
+          'استخدم "إضافة حقل" لحفظ الاسم، المحصول، المساحة، وإحداثيات GPS للحقل.',
+      'faq_sec_fields_line2':
+          'اضغط على بطاقة أي حقل لعرض دورة حياة المحصول الحالية، قراءات التربة، فحص NDVI، السجل والتوصيات.',
+      'faq_sec_lifecycle': 'دورة حياة المحصول',
+      'faq_sec_lifecycle_line1':
+          'تعرض بطاقات دورة حياة المحصول نافذة المراحل الزمنية والخطوات المطلوبة لكل نوع محصول.',
+      'faq_sec_lifecycle_line2':
+          'تشمل المحاصيل المدعومة القمح، الذرة، الأرز، الطماطم، البطاطس، المانجو، الذرة الرفيعة، والعلف الأخضر.',
+      'faq_sec_market': 'السوق والإشعارات',
+      'faq_sec_market_line1':
+          'يعرض قسم السوق أسعار المحاصيل وتفاصيل التوقعات بناءً على قراءات السوق الحية.',
+      'faq_sec_market_line2':
+          'يتحكم الملف الشخصي في تفعيل إشعارات الجوال والتنبيهات للطقس وأسعار السوق.',
+      'faq_sec_alerts': 'التنبيهات والإشعارات',
+      'faq_sec_alerts_line1':
+          'يمكن تفعيل أو تعطيل تنبيهات الطقس والأسعار من قسم الإعدادات بالملف الشخصي.',
+      'faq_sec_alerts_line2':
+          'يجب فحص الحالات الحرجة ميدانياً دائماً والتأكد منها قبل وضع أي خطة علاج كيميائي أو تسميد إضافي.',
+
+      'privacy_heading': 'بيانات مزرعتك تبقى ملكاً لك',
+      'privacy_summary':
+          'يستخدم فارم تك بيانات الحساب والمزرعة والموقع فقط لتقديم خدمات المراقبة والتوصيات الزراعية وتسهيل عملك.',
+      'privacy_sec_data': 'البيانات المستخدمة',
+      'privacy_sec_data_line1':
+          'بيانات الملف الشخصي، المزارع المحددة، المحاصيل، مواقع الحقول، وإعدادات التطبيق المفضلة.',
+      'privacy_sec_data_line2':
+          'يُستفاد من الإحداثيات للخرائط وتوقعات الطقس الدقيقة وتحديد حواف الحقول و NDVI.',
+      'privacy_sec_protect': 'كيفية حماية البيانات',
+      'privacy_sec_protect_line1':
+          'تُحفظ تفضيلاتك محلياً على هاتفك لتوفير تجربة استخدام أسرع وأكثر أماناً.',
+      'privacy_sec_protect_line2':
+          'نحن لا نبيع بياناتك الشخصية أو بيانات مزرعتك. وندعوك لمشاركة التقارير فقط مع من تثق بهم.',
+      'privacy_sec_choices': 'خياراتك وحقوقك',
+      'privacy_sec_choices_line1':
+          'يمكنك تعديل تفاصيل ملفك، وتخصيص تنبيهات الإشعارات، أو تسجيل الخروج بالكامل في أي وقت.',
+      'privacy_sec_choices_line2':
+          'يمكنك حذف أي مزرعة مخزنة عندما ترغب في إزالتها نهائياً من التطبيق.',
+
+      'about_heading': 'ذكاء زراعي دقيق لمزرعتك',
+      'about_summary':
+          'يجمع فارم تك بين فحص الحقول والتحليل بالاقمار الصناعية وقراءات الطقس والأسعار وتوجيهات الذكاء الاصطناعي في واجهة واحدة.',
+      'about_sec_build': 'ما نقوم ببنائه',
+      'about_sec_build_line1':
+          'أدوات تساعد المزارعين على فهم صحة المحاصيل، مستويات رطوبة وعناصر التربة، وجدولة الري وتغيرات السوق.',
+      'about_sec_build_line2':
+          'سير عمل ميداني بسيط يسهل الاستفادة من البيانات والخرائط أثناء التواجد بالأرض.',
+      'about_sec_approach': 'منهجنا ورؤيتنا',
+      'about_sec_approach_line1':
+          'توصيات واضحة ومقاييس عملية مع وصول سريع وحرص كامل على استهلاك الموارد بكفاءة.',
+      'about_sec_approach_line2':
+          'مساعد الذكاء الاصطناعي مصمم لدعم اتخاذ القرار وتوفير بدائل عملية، وليس بديلاً عن المعاينة الميدانية.',
+
+      'contact_heading': 'تحدث مع دعم فارم تك',
+      'contact_summary':
+          'اتصل بنا للمساعدة في الحساب، استفسارات إعداد الحقول، التعليقات الفنية، أو طلبات الشراكة.',
+      'contact_sec_support': 'الدعم الفني والاتصال',
+      'contact_sec_support_line1': 'البريد الإلكتروني: support@farmtec.io',
+      'contact_sec_support_line2': 'الهاتف: +20 100 000 0000',
+      'contact_sec_support_line3':
+          'ساعات العمل: الأحد إلى الخميس، من ٩:٠٠ صباحاً وحتى ٦:٠٠ مساءً بتوقيت القاهرة.',
+      'contact_sec_when': 'عند الاتصال بنا',
+      'contact_sec_when_line1':
+          'يرجى إرفاق اسم المزرعة والحقل والمحصول والمشكلة بالتفصيل لتسريع المساعدة.',
+      'contact_sec_when_line2':
+          'لمشاكل الخريطة أو NDVI يرجى إرسال إحداثيات GPS إن أمكن.',
+
+      // ── Extra Notifications ──
+      'market_update': 'تحديث الأسعار',
+      'just_now': 'الآن',
+      'notif_market_changed':
+          'تغير سعر القمح إلى {price}/طن. يرجى مراجعة استراتيجية البيع.',
+      'notif_market_up':
+          'ارتفع سعر القمح بنسبة ٢.٣٪ إلى ٢٨٧.٥٠ دولار/طن. فكر في البيع هذا الأسبوع.',
+      'notif_weather_adjust':
+          'يُتوقع تغير ملحوظ في درجات الحرارة غداً. يرجى تعديل الري بناءً على ذلك.',
     },
   };
 

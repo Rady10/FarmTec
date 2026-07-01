@@ -1,14 +1,12 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
 import 'package:farmtec/core/themes/pallete.dart';
-import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_card_style.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ProfitCalculatorCard extends StatelessWidget {
   final bool isDark;
-  final Color cardColor;
   final Color textColor;
   final Color subColor;
   final double marketPrice;
@@ -16,11 +14,15 @@ class ProfitCalculatorCard extends StatelessWidget {
   const ProfitCalculatorCard({
     super.key,
     required this.isDark,
-    required this.cardColor,
     required this.textColor,
     required this.subColor,
     required this.marketPrice,
   });
+
+  String _money(AppLocalizations l, double value) {
+    final amount = l.convertNumbers(value.toStringAsFixed(2));
+    return l.isArabic ? '$amount د.إ' : '\$$amount';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,101 +31,132 @@ class ProfitCalculatorCard extends StatelessWidget {
 
     final estimatedYield = yieldPrediction.yieldPerHa;
     final totalProfit = estimatedYield * marketPrice;
-    final unitLabel = yieldPrediction.unit.replaceAll('/ha', '');
+    final rawUnit =
+        yieldPrediction.unit.replaceAll('/ha', '').trim().toLowerCase();
+    final unitLabel = l.trOr(rawUnit, rawUnit);
+    final priceLabel =
+        l.isArabic
+            ? '${l.convertNumbers(marketPrice.toStringAsFixed(2))} د.إ${l.tr('per_ton')}'
+            : '\$${l.convertNumbers(marketPrice.toStringAsFixed(2))}${l.tr('per_ton')}';
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: dashboardCardDecoration(isDark, cardColor),
-      child: Column(
-        children: [
-          _profitRow(
-            l.tr('estimated_yield'),
-            '${l.convertNumbers(estimatedYield.toStringAsFixed(2))} $unitLabel',
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1),
-          const SizedBox(height: 12),
-          _profitRow(
-            l.tr('current_market_price'),
-            '\$${l.convertNumbers(marketPrice.toStringAsFixed(2))}/t',
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Icon(Icons.info_outline_rounded, size: 12, color: subColor),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    '${l.tr('source')}: ${yieldPrediction.crop} · ${yieldPrediction.field}',
-                    style: GoogleFonts.manrope(
-                      fontSize: 11,
-                      color: subColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: _metricTile(
+                label: l.tr('estimated_yield'),
+                value:
+                    '${l.convertNumbers(estimatedYield.toStringAsFixed(2))} $unitLabel',
+                icon: Icons.eco_rounded,
+                isDark: isDark,
+                subColor: subColor,
+                textColor: textColor,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _metricTile(
+                label: l.tr('current_market_price'),
+                value: priceLabel,
+                icon: Icons.paid_rounded,
+                isDark: isDark,
+                subColor: subColor,
+                textColor: textColor,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Pallete.primary.withAlpha(isDark ? 35 : 14),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Pallete.primary.withAlpha(isDark ? 40 : 20),
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Pallete.primary.withAlpha(15),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    l.tr('total_expected_profit'),
-                    style: GoogleFonts.manrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.savings_rounded,
+                      size: 16,
                       color: Pallete.primary,
                     ),
-                  ),
+                    const Spacer(),
+                    Text(
+                      l.tr('total_expected_profit'),
+                      style: AppFonts.font(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w600,
+                        color: Pallete.primary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _money(l, totalProfit),
+                      style: AppFonts.font(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        color: Pallete.primary,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  '\$${l.convertNumbers(totalProfit.toStringAsFixed(2))}',
-                  style: GoogleFonts.manrope(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: Pallete.primary,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _profitRow(String label, String value, {Color? valueColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
+  Widget _metricTile({
+    required String label,
+    required String value,
+    required IconData icon,
+    required bool isDark,
+    required Color subColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF8F9F6),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Pallete.darkOutline.withAlpha(40) : const Color(0xFFE8EBE4),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: Pallete.primary),
+          const Spacer(),
+          Text(
             label,
-            style: GoogleFonts.manrope(fontSize: 13, color: subColor),
+            style: AppFonts.font(fontSize: 8, color: subColor),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: valueColor ?? textColor,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: AppFonts.font(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: textColor,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

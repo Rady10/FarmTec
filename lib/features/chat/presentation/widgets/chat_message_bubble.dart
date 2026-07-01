@@ -1,7 +1,8 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/chat/data/models/chat_message.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessage message;
@@ -15,10 +16,13 @@ class ChatMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final displayText = l.convertNumbers(l.trOr(message.text, message.text));
     final isUser = message.sender == ChatSender.user;
+
     if (isUser) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -37,8 +41,8 @@ class ChatMessageBubble extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  message.text,
-                  style: GoogleFonts.manrope(
+                  displayText,
+                  style: AppFonts.font(
                     fontSize: 14,
                     color: Colors.white,
                     height: 1.5,
@@ -51,49 +55,64 @@ class ChatMessageBubble extends StatelessWidget {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    final bubbleColor =
+        isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF3F4F0);
+    final nameColor =
+        isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
+    final textClr = isDark ? Pallete.darkTextPrimary : Pallete.textPrimary;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
-            margin: const EdgeInsets.only(top: 2),
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: isDark ? Pallete.darkCard : Pallete.primary.withAlpha(15),
-              borderRadius: BorderRadius.circular(8),
+              color:
+                  isDark
+                      ? Pallete.primary.withAlpha(40)
+                      : const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.eco_rounded,
-              size: 16,
+              size: 18,
               color: isDark ? Pallete.chartGreen : Pallete.primary,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'FarmBrain',
-                  style: GoogleFonts.manrope(
+                  l.tr('farmbrain_ai'),
+                  style: AppFonts.font(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? Pallete.darkTextSecondary
-                        : Pallete.textTertiary,
+                    color: nameColor,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  message.text,
-                  style: GoogleFonts.manrope(
-                    fontSize: 14,
-                    color: isDark
-                        ? Pallete.darkTextPrimary
-                        : Pallete.textPrimary,
-                    height: 1.6,
+                const SizedBox(height: 6),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bubbleColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    displayText,
+                    style: AppFonts.font(
+                      fontSize: 14,
+                      color: textClr,
+                      height: 1.6,
+                    ),
                   ),
                 ),
               ],

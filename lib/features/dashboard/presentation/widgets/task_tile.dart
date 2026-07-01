@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_card_style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,12 +65,11 @@ class _TaskTileState extends State<TaskTile> {
               children: [
                 Text(
                   widget.title,
-                  style: GoogleFonts.manrope(
+                  style: AppFonts.font(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: isCompleted ? widget.subColor : widget.textColor,
-                    decoration:
-                        isCompleted ? TextDecoration.lineThrough : null,
+                    decoration: isCompleted ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -83,7 +83,7 @@ class _TaskTileState extends State<TaskTile> {
                     const SizedBox(width: 4),
                     Text(
                       widget.schedule,
-                      style: GoogleFonts.manrope(
+                      style: AppFonts.font(
                         fontSize: 11,
                         color: widget.subColor,
                       ),

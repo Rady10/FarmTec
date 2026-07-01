@@ -1,6 +1,6 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ProfileStatCard extends StatelessWidget {
   final String value;
@@ -8,7 +8,6 @@ class ProfileStatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final bool isDark;
-  final Color cardColor;
 
   const ProfileStatCard(
     this.value,
@@ -17,49 +16,34 @@ class ProfileStatCard extends StatelessWidget {
     this.color, {
     super.key,
     required this.isDark,
-    required this.cardColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 20 : 8),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: AppFonts.font(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: color,
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: GoogleFonts.manrope(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: color,
-              ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppFonts.font(
+              fontSize: 10,
+              color:
+                  isDark ? Pallete.darkTextSecondary : Pallete.textSecondary,
             ),
-            Text(
-              label,
-              style: GoogleFonts.manrope(
-                fontSize: 10,
-                color:
-                    isDark
-                        ? Pallete.darkTextSecondary
-                        : const Color(0xFF9CA3AF),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

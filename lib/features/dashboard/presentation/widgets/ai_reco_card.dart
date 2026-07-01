@@ -1,3 +1,5 @@
+import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_action_chip.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ class AiRecoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -50,8 +53,8 @@ class AiRecoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'AI RECOMMENDATION',
-                  style: GoogleFonts.manrope(
+                  l.tr('ai_recommendation').toUpperCase(),
+                  style: AppFonts.font(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
@@ -62,8 +65,8 @@ class AiRecoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  'Apply 15 kg/ha of Urea to $farmName for optimal nitrogen before next rainfall.',
-                  style: GoogleFonts.manrope(
+                  l.convertNumbers(l.trParams('ai_reco_apply_urea', {'farm': farmName})),
+                  style: AppFonts.font(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: textColor,
@@ -71,11 +74,11 @@ class AiRecoCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Row(
+                Row(
                   children: [
-                    DashboardActionChip(label: 'Apply Now', filled: true),
-                    SizedBox(width: 8),
-                    DashboardActionChip(label: 'Schedule', filled: false),
+                    DashboardActionChip(label: l.tr('apply_now'), filled: true),
+                    const SizedBox(width: 8),
+                    DashboardActionChip(label: l.tr('schedule'), filled: false),
                   ],
                 ),
               ],

@@ -19,12 +19,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
   runApp(
     MultiProvider(
       providers: [
@@ -59,6 +53,16 @@ class FarmTecApp extends StatelessWidget {
       theme: ThemeProvider.lightTheme,
       darkTheme: ThemeProvider.darkTheme,
       themeMode: themeProvider.mode,
+      builder: (context, child) {
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness:
+                themeProvider.isDark ? Brightness.light : Brightness.dark,
+          ),
+        );
+        return child!;
+      },
       locale: localeProvider.locale,
       supportedLocales: const [Locale('en'), Locale('ar')],
       localizationsDelegates: const [

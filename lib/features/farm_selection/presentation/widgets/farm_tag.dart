@@ -1,4 +1,5 @@
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,7 +24,7 @@ class FarmTag extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.manrope(
+        style: AppFonts.font(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: color,

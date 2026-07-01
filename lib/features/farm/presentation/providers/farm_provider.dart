@@ -53,4 +53,11 @@ class FarmProvider extends ChangeNotifier {
     _selectedFarm = await _repository.getSelectedFarm();
     notifyListeners();
   }
+
+  Future<void> updateFarm(Farm farm) async {
+    await _repository.updateFarm(farm);
+    _farms = await _repository.getFarms();
+    _selectedFarm = await _repository.getSelectedFarm();
+    notifyListeners();
+  }
 }

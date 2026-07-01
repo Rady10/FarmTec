@@ -6,17 +6,23 @@ import 'package:http/http.dart' as http;
 enum NotifType { general, weather, market }
 
 class AppNotification {
+  final String? titleKey;
+  final String? bodyKey;
+  final Map<String, String>? bodyParams;
   final String title;
   final String body;
-  final String time;
+  final String timeKey;
   final Color color;
   final bool isRead;
   final NotifType type;
 
   AppNotification({
-    required this.title,
-    required this.body,
-    required this.time,
+    this.titleKey,
+    this.bodyKey,
+    this.bodyParams,
+    this.title = '',
+    this.body = '',
+    this.timeKey = 'just_now',
     required this.color,
     this.isRead = false,
     this.type = NotifType.general,
@@ -28,36 +34,35 @@ class AppNotificationService extends ChangeNotifier {
   List<AppNotification> get notifications => List.unmodifiable(_notifications);
 
   Future<void> fetchDynamicAlerts(NotificationSettingsService settings) async {
-    // 1. Fetch Market Price if enabled
     if (settings.marketPriceAlerts) {
       try {
-        // Attempt to fetch from commodities-api
-        final res = await http.get(Uri.parse('https://commodities-api.com/api/latest?access_key=DEMO&base=USD&symbols=WHEAT,CORN'));
+        final res = await http.get(Uri.parse(
+            'https://commodities-api.com/api/latest?access_key=DEMO&base=USD&symbols=WHEAT,CORN'));
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body);
           if (data['data'] != null && data['data']['rates'] != null) {
-            final double wheatPrice = data['data']['rates']['WHEAT'] ?? 287.50;
+            final double wheatPrice =
+                data['data']['rates']['WHEAT'] ?? 287.50;
             _addNotif(
-              title: 'Market Update',
-              body: 'Wheat price changed to \$${wheatPrice.toStringAsFixed(2)}/t. Review your selling strategy.',
+              titleKey: 'market_update',
+              bodyKey: 'notif_market_changed',
+              bodyParams: {'price': wheatPrice.toStringAsFixed(2)},
               color: const Color(0xFF4CAF50),
               type: NotifType.market,
             );
           }
         } else {
-           _addMockMarket();
+          _addMockMarket();
         }
       } catch (_) {
-         _addMockMarket();
+        _addMockMarket();
       }
     }
 
-    // 2. Fetch Weather if enabled
     if (settings.weatherAlerts) {
-      // Add dynamic weather alert
       _addNotif(
-        title: 'Weather Alert',
-        body: 'Significant temperature change expected tomorrow. Adjust irrigation accordingly.',
+        titleKey: 'weather_alert',
+        bodyKey: 'notif_weather_adjust',
         color: const Color(0xFFFF9800),
         type: NotifType.weather,
       );
@@ -67,28 +72,29 @@ class AppNotificationService extends ChangeNotifier {
   }
 
   void _addMockMarket() {
-      _addNotif(
-        title: 'Market Update',
-        body: 'Wheat price up 2.3% to \$287.50/t. Consider selling this week.',
-        color: const Color(0xFF4CAF50),
-        type: NotifType.market,
-      );
+    _addNotif(
+      titleKey: 'market_update',
+      bodyKey: 'notif_market_up',
+      color: const Color(0xFF4CAF50),
+      type: NotifType.market,
+    );
   }
 
   void _addNotif({
-    required String title,
-    required String body,
+    String? titleKey,
+    String? bodyKey,
+    Map<String, String>? bodyParams,
     required Color color,
     required NotifType type,
   }) {
-    // avoid duplicates
-    if (!_notifications.any((n) => n.title == title && n.type == type)) {
+    if (!_notifications.any((n) => n.titleKey == titleKey && n.type == type)) {
       _notifications.insert(
         0,
         AppNotification(
-          title: title,
-          body: body,
-          time: 'Just now',
+          titleKey: titleKey,
+          bodyKey: bodyKey,
+          bodyParams: bodyParams,
+          timeKey: 'just_now',
           color: color,
           type: type,
         ),

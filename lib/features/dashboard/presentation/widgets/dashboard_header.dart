@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/providers/theme_provider.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_icon_button.dart';
@@ -6,7 +7,6 @@ import 'package:farmtec/features/farm_selection/presentation/screens/farm_select
 import 'package:farmtec/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:farmtec/features/profile/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class DashboardHeader extends StatelessWidget {
@@ -23,56 +23,31 @@ class DashboardHeader extends StatelessWidget {
     required this.subColor,
   });
 
+  String _getInitial(String name) {
+    if (name.isEmpty) return '?';
+    return name[0].toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final l = AppLocalizations.of(context);
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context).tr('good_morning'),
-                style: GoogleFonts.manrope(fontSize: 14, color: subColor),
-              ),
-              const SizedBox(height: 4),
-              GestureDetector(
-                onTap: () => Navigator.pushReplacementNamed(
-                  context,
-                  FarmSelectionScreen.routeName,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      farmName,
-                      style: GoogleFonts.manrope(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Pallete.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.swap_horiz_rounded,
-                        size: 16,
-                        color: textColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        // ── Left: Notification + Dark mode ──
+        DashboardIconButton(
+          icon: Icons.notifications_rounded,
+          isDark: isDark,
+          hasBadge: true,
+          badgeCount: 2,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
           ),
         ),
+        const SizedBox(width: 10),
         DashboardIconButton(
           icon: themeProvider.isDark
               ? Icons.light_mode_rounded
@@ -80,17 +55,52 @@ class DashboardHeader extends StatelessWidget {
           isDark: isDark,
           onTap: () => themeProvider.toggle(),
         ),
-        const SizedBox(width: 10),
-        DashboardIconButton(
-          icon: Icons.notifications_rounded,
-          isDark: isDark,
-          hasBadge: true,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-          ),
+        const Spacer(),
+        // ── Right: Greeting + Name + Avatar ──
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l.tr('good_morning'),
+              style: AppFonts.font(fontSize: 12, color: subColor),
+            ),
+            const SizedBox(height: 2),
+            GestureDetector(
+              onTap: () => Navigator.pushReplacementNamed(
+                context,
+                FarmSelectionScreen.routeName,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Pallete.primary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.swap_horiz_rounded,
+                      size: 14,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    farmName,
+                    style: AppFonts.font(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         GestureDetector(
           onTap: () => Navigator.push(
             context,
@@ -110,10 +120,15 @@ class DashboardHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: Colors.white,
-              size: 22,
+            child: Center(
+              child: Text(
+                _getInitial(farmName),
+                style: AppFonts.font(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ),

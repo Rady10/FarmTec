@@ -1,4 +1,4 @@
-import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_models_view.dart';
 import 'package:farmtec/features/chat/presentation/screens/farmbrain_chat_screen.dart';
 import 'package:farmtec/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -28,25 +28,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
 
     return Scaffold(
-      backgroundColor: isDark ? Pallete.darkBackground : Pallete.background,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                child: KeyedSubtree(
-                  key: ValueKey(_currentIndex),
-                  child: _pages[_currentIndex],
-                ),
+      backgroundColor: colors.background,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: KeyedSubtree(
+                key: ValueKey(_currentIndex),
+                child: _pages[_currentIndex],
               ),
             ),
+          ),
             Positioned(
               left: 0,
               right: 0,
@@ -82,7 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 }

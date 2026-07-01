@@ -1,4 +1,6 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/features/farm_selection/presentation/widgets/add_farm_sheet.dart';
@@ -36,12 +38,13 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.appColors;
+    final isDark = context.isDarkTheme;
     final l = AppLocalizations.of(context);
     final farmService = Provider.of<FarmProvider>(context);
-    final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
-    final subColor = isDark ? Pallete.darkTextSecondary : Pallete.textSecondary;
-    final bgColor = isDark ? Pallete.darkBackground : Pallete.background;
+    final textColor = colors.textPrimary;
+    final subColor = colors.textSecondary;
+    final bgColor = colors.background;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -58,7 +61,7 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
                   const SizedBox(height: 24),
                   Text(
                     l.tr('select_farm'),
-                    style: GoogleFonts.manrope(
+                    style: AppFonts.font(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: textColor,
@@ -67,7 +70,7 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
                   const SizedBox(height: 4),
                   Text(
                     l.tr('select_farm_subtitle'),
-                    style: GoogleFonts.manrope(fontSize: 14, color: subColor),
+                    style: AppFonts.font(fontSize: 14, color: subColor),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -77,14 +80,14 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: isDark ? Pallete.darkSurfaceVariant : Pallete.neutral100,
+                color: colors.chipBg,
                 borderRadius: BorderRadius.circular(14),
               ),
               padding: const EdgeInsets.all(4),
               child: TabBar(
                 controller: _tabCtrl,
                 indicator: BoxDecoration(
-                  color: isDark ? Pallete.darkCard : Colors.white,
+                  color: colors.card,
                   borderRadius: BorderRadius.circular(11),
                   boxShadow: [
                     BoxShadow(
@@ -98,11 +101,11 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
                 dividerColor: Colors.transparent,
                 labelColor: textColor,
                 unselectedLabelColor: subColor,
-                labelStyle: GoogleFonts.manrope(
+                labelStyle: AppFonts.font(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
-                unselectedLabelStyle: GoogleFonts.manrope(
+                unselectedLabelStyle: AppFonts.font(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -156,7 +159,7 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
                           children: [
                             Text(
                               l.tr('continue_text'),
-                              style: GoogleFonts.manrope(
+                              style: AppFonts.font(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -177,7 +180,7 @@ class _FarmSelectionScreenState extends State<FarmSelectionScreen>
                       ),
                       label: Text(
                         l.tr('add_farm'),
-                        style: GoogleFonts.manrope(
+                        style: AppFonts.font(
                           fontWeight: FontWeight.w600,
                           color: Pallete.accent,
                         ),

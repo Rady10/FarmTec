@@ -8,26 +8,39 @@ class ChatTypingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    final bubbleColor =
+        isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF3F4F0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: isDark ? Pallete.darkCard : Pallete.primary.withAlpha(15),
-              borderRadius: BorderRadius.circular(8),
+              color:
+                  isDark
+                      ? Pallete.primary.withAlpha(40)
+                      : const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.eco_rounded,
-              size: 16,
+              size: 18,
               color: isDark ? Pallete.chartGreen : Pallete.primary,
             ),
           ),
-          const SizedBox(width: 12),
-          ChatAnimatedDots(isDark: isDark),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: bubbleColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: ChatAnimatedDots(isDark: isDark),
+          ),
         ],
       ),
     );
@@ -79,9 +92,10 @@ class _ChatAnimatedDotsState extends State<ChatAnimatedDots>
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: widget.isDark
-                      ? Pallete.darkTextTertiary
-                      : Pallete.textHint.withAlpha(150),
+                  color:
+                      widget.isDark
+                          ? Pallete.darkTextTertiary
+                          : Pallete.textHint.withAlpha(150),
                   shape: BoxShape.circle,
                 ),
               ),

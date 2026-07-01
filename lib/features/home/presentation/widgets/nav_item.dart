@@ -15,13 +15,13 @@ class NavItem {
 const navItems = [
   NavItem(
     key: 'dashboard',
-    icon: Icons.dashboard_outlined,
-    activeIcon: Icons.dashboard_rounded,
+    icon: Icons.grid_view_rounded,
+    activeIcon: Icons.grid_view_rounded,
   ),
   NavItem(
     key: 'my_farm',
-    icon: Icons.grass_outlined,
-    activeIcon: Icons.grass_rounded,
+    icon: Icons.eco_outlined,
+    activeIcon: Icons.eco_rounded,
   ),
   NavItem(
     key: 'ai_models',
@@ -31,6 +31,6 @@ const navItems = [
   NavItem(
     key: 'market',
     icon: Icons.show_chart_rounded,
-    activeIcon: Icons.candlestick_chart_rounded,
+    activeIcon: Icons.show_chart_rounded,
   ),
 ];

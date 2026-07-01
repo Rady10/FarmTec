@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,7 +39,7 @@ class FarmSelectionEmptyState extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             l.tr('add_first_farm'),
-            style: GoogleFonts.manrope(
+            style: AppFonts.font(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: textColor,
@@ -47,7 +48,7 @@ class FarmSelectionEmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             l.tr('add_first_farm_desc'),
-            style: GoogleFonts.manrope(fontSize: 14, color: subColor),
+            style: AppFonts.font(fontSize: 14, color: subColor),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -62,7 +63,7 @@ class FarmSelectionEmptyState extends StatelessWidget {
             icon: const Icon(Icons.add_rounded, size: 20),
             label: Text(
               l.tr('add_farm'),
-              style: GoogleFonts.manrope(fontWeight: FontWeight.w700),
+              style: AppFonts.font(fontWeight: FontWeight.w700),
             ),
           ),
         ],

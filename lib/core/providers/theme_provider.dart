@@ -1,7 +1,10 @@
+import 'package:farmtec/core/themes/app_fonts.dart';
+import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ThemeProvider extends ChangeNotifier {
   static const _key = 'theme_mode';
@@ -53,7 +56,7 @@ class ThemeProvider extends ChangeNotifier {
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: Pallete.background,
-        textTheme: GoogleFonts.manropeTextTheme(),
+        textTheme: AppFonts.textTheme,
         appBarTheme: const AppBarTheme(
           backgroundColor: Pallete.background,
           elevation: 0,
@@ -99,6 +102,7 @@ class ThemeProvider extends ChangeNotifier {
             ),
           ),
         ),
+        extensions: const [AppThemeColors.light],
       );
 
   // ── Dark Theme ─────────────────────────────────────────────────────────────
@@ -114,7 +118,7 @@ class ThemeProvider extends ChangeNotifier {
           brightness: Brightness.dark,
         ),
         scaffoldBackgroundColor: Pallete.darkBackground,
-        textTheme: GoogleFonts.manropeTextTheme(
+        textTheme: AppFonts.textThemeWith(
           ThemeData.dark().textTheme,
         ),
         appBarTheme: const AppBarTheme(
@@ -163,5 +167,6 @@ class ThemeProvider extends ChangeNotifier {
             ),
           ),
         ),
+        extensions: const [AppThemeColors.dark],
       );
 }

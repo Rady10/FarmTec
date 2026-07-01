@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
-class AIModelDefinition {
-  final String name;
+class AIModelDefinition {  final String name;
   final String desc;
   final String apiUrl;
   final IconData icon;
-  final Color color;
+  final String backgroundImage;
   final List<AIModelFieldDefinition> fields;
 
   const AIModelDefinition({
     required this.name,
     required this.desc,
     required this.icon,
-    required this.color,
+    required this.backgroundImage,
     required this.apiUrl,
     required this.fields,
   });
