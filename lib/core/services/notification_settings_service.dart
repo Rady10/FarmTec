@@ -1,4 +1,6 @@
+import 'package:farmtec/core/services/push_notification_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationSettingsService extends ChangeNotifier {
@@ -32,6 +34,9 @@ class NotificationSettingsService extends ChangeNotifier {
     _pushEnabled = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_pushKey, value);
+    if (value) {
+      await PushNotificationService.instance.requestPermission();
+    }
     notifyListeners();
   }
 

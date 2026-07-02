@@ -2,6 +2,7 @@ import 'package:farmtec/core/helpers/on_generate_routes.dart';
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/providers/locale_provider.dart';
 import 'package:farmtec/core/providers/theme_provider.dart';
+import 'package:farmtec/core/services/push_notification_service.dart';
 import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await PushNotificationService.instance.initialize();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

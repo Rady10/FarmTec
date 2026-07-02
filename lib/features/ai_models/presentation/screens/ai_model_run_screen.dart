@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:farmtec/core/themes/app_fonts.dart';
 
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
+import 'package:farmtec/core/services/plant_disease_vision_service.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
@@ -10,8 +13,8 @@ import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_backgro
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class AiModelRunScreen extends StatefulWidget {
@@ -25,11 +28,15 @@ class AiModelRunScreen extends StatefulWidget {
 
 class _AiModelRunScreenState extends State<AiModelRunScreen> {
   late Map<String, TextEditingController> _controllers;
+  final _visionService = PlantDiseaseVisionService();
+  final _imagePicker = ImagePicker();
+  XFile? _selectedImage;
   bool _loading = false;
   String? _result;
   bool _isError = false;
 
   static const _statValues = {
+    'Disease Detection': {'accuracy': '91%', 'speed': '3.5s', 'runs': '1.8K'},
     'Crop Recommendation': {'accuracy': '94%', 'speed': '1.2s', 'runs': '2.4K'},
     'Yield Prediction': {'accuracy': '92%', 'speed': '1.5s', 'runs': '5.6K'},
     'Irrigation Planner': {'accuracy': '93%', 'speed': '1.8s', 'runs': '3.2K'},
@@ -66,17 +73,59 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     for (final c in _controllers.values) {
       c.dispose();
     }
+    _visionService.dispose();
     super.dispose();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await _imagePicker.pickImage(
+      source: source,
+      maxWidth: 1600,
+      imageQuality: 85,
+    );
+    if (image != null && mounted) {
+      setState(() => _selectedImage = image);
+    }
+  }
+
   Future<void> _runPrediction() async {
+    if (widget.model.isVisionModel && _selectedImage == null) {
+      setState(() {
+        _isError = true;
+        _result = AppLocalizations.of(context).tr('photo_required');
+      });
+      return;
+    }
+
     setState(() {
       _loading = true;
       _result = null;
       _isError = false;
     });
     try {
-      http.Response response;
+      if (widget.model.isVisionModel) {
+        final bytes = await _selectedImage!.readAsBytes();
+        final prompt = _controllers['prompt']?.text ?? '';
+        final analysis = await _visionService.analyze(
+          imageBytes: bytes,
+          prompt: prompt,
+        );
+        if (!mounted) return;
+        _result = analysis;
+        await _persistResult(analysis);
+      } else {
+        await _runStandardPrediction();
+      }
+    } catch (_) {
+      if (!mounted) return;
+      _isError = true;
+      _result = AppLocalizations.of(context).tr('connection_error');
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  Future<void> _runStandardPrediction() async {
+    http.Response response;
       if (widget.model.name == 'Market Forecast') {
         response = await http
             .get(Uri.parse(widget.model.apiUrl))
@@ -133,16 +182,12 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
           {'code': response.statusCode.toString()},
         );
       }
-    } catch (_) {
-      if (!mounted) return;
-      _isError = true;
-      _result = AppLocalizations.of(context).tr('connection_error');
-    }
-    if (mounted) setState(() => _loading = false);
   }
 
   String? _titleKeyForModel(String name) {
     switch (name) {
+      case 'Disease Detection':
+        return 'op_ai_disease_detection';
       case 'Crop Recommendation':
         return 'op_ai_crop_recommendation';
       case 'Yield Prediction':
@@ -158,6 +203,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
 
   OperationType _typeForModel(String name) {
     switch (name) {
+      case 'Disease Detection':
+        return OperationType.diseaseScan;
       case 'Irrigation Planner':
         return OperationType.irrigation;
       case 'Crop Recommendation':
@@ -210,6 +257,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
 
   String _fmt(dynamic d, AppLocalizations l) {
     switch (widget.model.name) {
+      case 'Disease Detection':
+        return d is String ? d : d.toString();
       case 'Crop Recommendation':
         final c =
             (d['predicted_crop'] ?? d['prediction'] ?? 'Unknown').toString();
@@ -341,7 +390,9 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'FarmBrain ML · HuggingFace',
+                          widget.model.isVisionModel
+                              ? l.tr('vision_model_badge')
+                              : 'FarmBrain ML · HuggingFace',
                           style: AppFonts.font(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -421,7 +472,64 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  if (widget.model.fields.isNotEmpty) ...[
+                  if (widget.model.isVisionModel) ...[
+                    Text(
+                      l.tr('upload_plant_photo'),
+                      style: AppFonts.font(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildVisionPhotoPicker(
+                      l: l,
+                      isDark: isDark,
+                      textColor: textColor,
+                      subColor: subColor,
+                      fillColor: fillColor,
+                      colors: colors,
+                      accentGreen: accentGreen,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l.tr('optional_question'),
+                      style: AppFonts.font(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _controllers['prompt'],
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 4,
+                      minLines: 3,
+                      style: AppFonts.font(fontSize: 14, color: textColor),
+                      decoration: InputDecoration(
+                        hintText: l.tr('plant_question_hint'),
+                        hintStyle: AppFonts.font(
+                          fontSize: 13,
+                          color: colors.textHint,
+                        ),
+                        filled: true,
+                        fillColor: fillColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(
+                            color: accentGreen,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                    ),
+                  ] else if (widget.model.fields.isNotEmpty) ...[
                     Text(
                       l.tr('input_parameters'),
                       style: AppFonts.font(
@@ -503,7 +611,12 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                       ),
                       icon: _loading
                           ? const SizedBox.shrink()
-                          : const Icon(Icons.play_arrow_rounded, size: 22),
+                          : Icon(
+                              widget.model.isVisionModel
+                                  ? Icons.biotech_rounded
+                                  : Icons.play_arrow_rounded,
+                              size: 22,
+                            ),
                       onPressed: _loading ? null : _runPrediction,
                       label: _loading
                           ? const SizedBox(
@@ -515,7 +628,9 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                               ),
                             )
                           : Text(
-                              l.tr('run_prediction'),
+                              widget.model.isVisionModel
+                                  ? l.tr('analyze_plant')
+                                  : l.tr('run_prediction'),
                               style: AppFonts.font(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -591,6 +706,109 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildVisionPhotoPicker({
+    required AppLocalizations l,
+    required bool isDark,
+    required Color textColor,
+    required Color subColor,
+    required Color fillColor,
+    required AppThemeColors colors,
+    required Color accentGreen,
+  }) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          height: 190,
+          decoration: BoxDecoration(
+            color: fillColor,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: _selectedImage == null
+                  ? colors.outline.withAlpha(isDark ? 80 : 120)
+                  : accentGreen.withAlpha(120),
+              width: 1.5,
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: _selectedImage == null
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      size: 42,
+                      color: subColor,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l.tr('tap_to_add_photo'),
+                      style: AppFonts.font(fontSize: 13, color: subColor),
+                    ),
+                  ],
+                )
+              : Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.file(
+                      File(_selectedImage!.path),
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: IconButton.filled(
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.black.withAlpha(140),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => setState(() => _selectedImage = null),
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImage(ImageSource.camera),
+                icon: const Icon(Icons.photo_camera_outlined, size: 18),
+                label: Text(l.tr('take_photo')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: textColor,
+                  side: BorderSide(color: colors.outline.withAlpha(120)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library_outlined, size: 18),
+                label: Text(l.tr('choose_from_gallery')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: textColor,
+                  side: BorderSide(color: colors.outline.withAlpha(120)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

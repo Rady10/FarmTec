@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
-class AIModelDefinition {  final String name;
+enum AIModelKind { standard, vision }
+
+class AIModelDefinition {
+  final String name;
   final String desc;
   final String apiUrl;
   final IconData icon;
   final String backgroundImage;
   final List<AIModelFieldDefinition> fields;
+  final AIModelKind kind;
 
   const AIModelDefinition({
     required this.name,
@@ -14,7 +18,10 @@ class AIModelDefinition {  final String name;
     required this.backgroundImage,
     required this.apiUrl,
     required this.fields,
+    this.kind = AIModelKind.standard,
   });
+
+  bool get isVisionModel => kind == AIModelKind.vision;
 }
 
 class AIModelFieldDefinition {

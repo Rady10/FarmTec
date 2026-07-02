@@ -1,6 +1,7 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
+import 'package:farmtec/core/config/disease_detection_config.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_tile.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,22 @@ class AIModelsView extends StatelessWidget {
   const AIModelsView({super.key});
 
   static const _models = [
+    AIModelDefinition(
+      name: 'Disease Detection',
+      desc: 'Upload crop photos for instant disease identification.',
+      icon: Icons.biotech_rounded,
+      backgroundImage: 'assets/images/plant.png',
+      apiUrl: DiseaseDetectionConfig.predictUrl,
+      kind: AIModelKind.vision,
+      fields: [
+        AIModelFieldDefinition(
+          key: 'prompt',
+          label: 'Question',
+          hint: 'Describe symptoms or ask about the plant...',
+          type: TextInputType.multiline,
+        ),
+      ],
+    ),
     AIModelDefinition(
       name: 'Crop Recommendation',
       desc: 'Predicts optimal crop based on GPS location',
@@ -236,6 +253,7 @@ class AIModelsView extends StatelessWidget {
                   cardColor: cardColor,
                   textColor: textColor,
                   subColor: subColor,
+                  isNew: _models[i].isVisionModel,
                 ),
               ),
             ],

@@ -35,6 +35,8 @@ class AiModelTile extends StatelessWidget {
         return const Color(0xFF00897B); // teal
       case Icons.show_chart_rounded:
         return const Color(0xFF2E7D32); // dark green
+      case Icons.biotech_rounded:
+        return const Color(0xFF6A994E); // plant green
       default:
         return Pallete.primary;
     }
@@ -163,11 +165,13 @@ class AiModelTile extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                model.fields.isEmpty
-                                    ? l.tr('get_request')
-                                    : l.trParams('parameters_count', {
-                                        'count': '${model.fields.length}',
-                                      }),
+                                model.isVisionModel
+                                    ? l.tr('photo_and_text')
+                                    : model.fields.isEmpty
+                                        ? l.tr('get_request')
+                                        : l.trParams('parameters_count', {
+                                            'count': '${model.fields.length}',
+                                          }),
                                 style: AppFonts.font(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,

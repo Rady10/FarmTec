@@ -150,6 +150,18 @@ class AppLocalizations {
       'stat_accuracy': 'Accuracy',
       'stat_speed': 'Speed',
       'stat_runs': 'Runs',
+      'photo_and_text': 'Photo + text',
+      'new_badge': 'NEW',
+      'upload_plant_photo': 'Upload Plant Photo',
+      'take_photo': 'Camera',
+      'choose_from_gallery': 'Gallery',
+      'tap_to_add_photo': 'Add a clear photo of the affected leaf or plant',
+      'photo_required': 'Please add a plant photo before running analysis.',
+      'vision_model_badge': 'Vision LLM · HuggingFace',
+      'analyze_plant': 'Analyze Plant',
+      'optional_question': 'Optional Question',
+      'plant_question_hint':
+          'Describe symptoms or ask about treatment, crop type, or severity...',
 
       // ── Market ──
       'market_prices': 'Market Prices',
@@ -226,6 +238,7 @@ class AppLocalizations {
       'op_ai_yield_prediction': 'Yield Prediction',
       'op_ai_irrigation_planner': 'Irrigation Planner',
       'op_ai_market_forecast': 'Market Forecast',
+      'op_ai_disease_detection': 'Disease Detection',
       'no_activity_yet': 'No activity yet',
       'activity_on_farm': 'Farm: {farm}',
       'ndvi_scan': 'NDVI Scan',
@@ -269,6 +282,13 @@ class AppLocalizations {
       'notifications_off': 'Notifications are turned off.',
       'no_notifications_match':
           'No notifications match your alert settings.',
+      'notifications_subtitle': 'Weather, market, and farm alerts in one place',
+      'notifications_empty_hint':
+          'Pull down to refresh or adjust alert settings in Profile.',
+      'mark_all_read': 'Mark all read',
+      'enable_push_prompt':
+          'Allow push notifications to receive weather and market alerts.',
+      'enable': 'Enable',
 
       // ── Chat ──
       'farmbrain_ai': 'FarmBrain AI',
@@ -625,6 +645,18 @@ class AppLocalizations {
       'stat_accuracy': 'الدقة',
       'stat_speed': 'السرعة',
       'stat_runs': 'التشغيلات',
+      'photo_and_text': 'صورة + نص',
+      'new_badge': 'جديد',
+      'upload_plant_photo': 'ارفع صورة النبات',
+      'take_photo': 'التقاط',
+      'choose_from_gallery': 'المعرض',
+      'tap_to_add_photo': 'أضف صورة واضحة للورقة أو النبات المتضرر',
+      'photo_required': 'يرجى إضافة صورة للنبات قبل بدء التحليل.',
+      'vision_model_badge': 'نموذج رؤية · HuggingFace',
+      'analyze_plant': 'تحليل النبات',
+      'optional_question': 'سؤال اختياري',
+      'plant_question_hint':
+          'صف الأعراض أو اسأل عن العلاج أو نوع المحصول أو شدة المرض...',
 
       // ── Market ──
       'market_prices': 'أسعار المحاصيل',
@@ -701,6 +733,7 @@ class AppLocalizations {
       'op_ai_yield_prediction': 'توقع المحصول',
       'op_ai_irrigation_planner': 'تخطيط الري',
       'op_ai_market_forecast': 'توقعات السوق',
+      'op_ai_disease_detection': 'كشف الأمراض',
       'no_activity_yet': 'لا يوجد نشاط بعد',
       'activity_on_farm': 'المزرعة: {farm}',
       'ndvi_scan': 'فحص NDVI',
@@ -743,6 +776,13 @@ class AppLocalizations {
       'year': 'السنة',
       'notifications_off': 'الإشعارات معطّلة.',
       'no_notifications_match': 'لا توجد إشعارات تطابق إعداداتك.',
+      'notifications_subtitle': 'تنبيهات الطقس والسوق والمزرعة في مكان واحد',
+      'notifications_empty_hint':
+          'اسحب للأسفل للتحديث أو عدّل إعدادات التنبيهات من الملف الشخصي.',
+      'mark_all_read': 'تعليم الكل كمقروء',
+      'enable_push_prompt':
+          'فعّل الإشعارات الفورية لتلقي تنبيهات الطقس والأسعار.',
+      'enable': 'تفعيل',
 
       // ── Chat ──
       'farmbrain_ai': 'المساعد الذكي',

@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 
 class NotificationCard extends StatelessWidget {
   final AppNotification item;
+  final VoidCallback? onTap;
 
-  const NotificationCard({super.key, required this.item});
+  const NotificationCard({super.key, required this.item, this.onTap});
 
   String _title(AppLocalizations l) {
     if (item.titleKey != null) return l.tr(item.titleKey!);
@@ -31,7 +32,9 @@ class NotificationCard extends StatelessWidget {
     final colors = context.appColors;
     final isDark = context.isDarkTheme;
 
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -111,6 +114,7 @@ class NotificationCard extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -120,6 +124,8 @@ class NotificationCard extends StatelessWidget {
         return Icons.wb_cloudy_outlined;
       case NotifType.market:
         return Icons.show_chart_rounded;
+      case NotifType.disease:
+        return Icons.biotech_rounded;
       case NotifType.general:
         return Icons.notifications_outlined;
     }

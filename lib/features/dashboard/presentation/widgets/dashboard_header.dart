@@ -1,4 +1,5 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/providers/theme_provider.dart';
 import 'package:farmtec/core/themes/pallete.dart';
@@ -33,6 +34,8 @@ class DashboardHeader extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final l = AppLocalizations.of(context);
 
+    final unreadCount = context.watch<AppNotificationService>().unreadCount;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -40,8 +43,8 @@ class DashboardHeader extends StatelessWidget {
         DashboardIconButton(
           icon: Icons.notifications_rounded,
           isDark: isDark,
-          hasBadge: true,
-          badgeCount: 2,
+          hasBadge: unreadCount > 0,
+          badgeCount: unreadCount,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NotificationsScreen()),
