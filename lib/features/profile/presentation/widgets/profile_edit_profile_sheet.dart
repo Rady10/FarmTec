@@ -43,13 +43,6 @@ class ProfileEditProfileSheet extends StatelessWidget {
             Icons.phone_outlined,
             isDark: isDark,
           ),
-          const SizedBox(height: 12),
-          ProfileSheetField(
-            l.tr('farm_name'),
-            'Al-Rashid Farms',
-            Icons.agriculture_rounded,
-            isDark: isDark,
-          ),
           const SizedBox(height: 20),
           ProfileSheetButton(
             l.tr('save_changes'),

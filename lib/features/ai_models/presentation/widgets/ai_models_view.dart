@@ -13,7 +13,7 @@ class AIModelsView extends StatelessWidget {
     AIModelDefinition(
       name: 'Disease Detection',
       desc: 'Upload crop photos for instant disease identification.',
-      icon: Icons.biotech_rounded,
+      icon: Icons.bug_report_rounded,
       backgroundImage: 'assets/images/plant.png',
       apiUrl: DiseaseDetectionConfig.predictUrl,
       kind: AIModelKind.vision,
@@ -29,7 +29,7 @@ class AIModelsView extends StatelessWidget {
     AIModelDefinition(
       name: 'Crop Recommendation',
       desc: 'Predicts optimal crop based on GPS location',
-      icon: Icons.eco_rounded,
+      icon: Icons.agriculture_rounded,
       backgroundImage: 'assets/images/crop_rec.png',
       apiUrl: 'https://youssef-d1aa-croprecommend.hf.space/predict',
       fields: [
@@ -50,7 +50,7 @@ class AIModelsView extends StatelessWidget {
     AIModelDefinition(
       name: 'Yield Prediction',
       desc: 'Forecasts crop yield from location, year & crop type',
-      icon: Icons.bar_chart_rounded,
+      icon: Icons.trending_up_rounded,
       backgroundImage: 'assets/images/yield.png',
       apiUrl: 'https://youssef-d1aa-yieldpredict.hf.space/predict_yield',
       fields: [
@@ -83,7 +83,7 @@ class AIModelsView extends StatelessWidget {
     AIModelDefinition(
       name: 'Irrigation Planner',
       desc: 'Calculates irrigation needs from GPS coordinates',
-      icon: Icons.water_rounded,
+      icon: Icons.water_drop_rounded,
       backgroundImage: 'assets/images/irri.png',
       apiUrl: 'https://B1R-14N15-irrigation.hf.space/predict',
       fields: [
@@ -104,7 +104,7 @@ class AIModelsView extends StatelessWidget {
     AIModelDefinition(
       name: 'Market Forecast',
       desc: 'Commodity price forecast from live market data',
-      icon: Icons.show_chart_rounded,
+      icon: Icons.insights_rounded,
       backgroundImage: 'assets/images/prices.png',
       apiUrl: 'https://b1r-14n15-forecast.hf.space/forecast',
       fields: [],

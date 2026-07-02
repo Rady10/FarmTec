@@ -15,16 +15,16 @@ class _SuggestionItem {
   });
 }
 
-class ChatSuggestions extends StatelessWidget {
+class ChatQuestions extends StatelessWidget {
   final bool isDark;
   final AppLocalizations l;
-  final ValueChanged<String> onSuggestionTap;
+  final ValueChanged<String> onQuestionTap;
 
-  const ChatSuggestions({
+  const ChatQuestions({
     super.key,
     required this.isDark,
     required this.l,
-    required this.onSuggestionTap,
+    required this.onQuestionTap,
   });
 
   String _label(String key) {
@@ -38,27 +38,27 @@ class ChatSuggestions extends StatelessWidget {
       _SuggestionItem(
         icon: Icons.eco_rounded,
         color: Color(0xFF4CAF50),
-        labelKey: 'suggestion_analyze',
+        labelKey: 'question_field_health',
       ),
       _SuggestionItem(
         icon: Icons.water_drop_rounded,
         color: Color(0xFF2196F3),
-        labelKey: 'suggestion_irrigation',
+        labelKey: 'question_irrigation',
       ),
       _SuggestionItem(
         icon: Icons.bug_report_rounded,
         color: Color(0xFF66BB6A),
-        labelKey: 'suggestion_disease',
+        labelKey: 'question_disease',
       ),
       _SuggestionItem(
         icon: Icons.show_chart_rounded,
         color: Color(0xFFEF4444),
-        labelKey: 'suggestion_market',
+        labelKey: 'question_market',
       ),
       _SuggestionItem(
         icon: Icons.spa_rounded,
         color: Color(0xFF43A047),
-        labelKey: 'suggestion_crop',
+        labelKey: 'question_crop',
       ),
     ];
 
@@ -75,7 +75,7 @@ class ChatSuggestions extends StatelessWidget {
             items.map((item) {
               final label = _label(item.labelKey);
               return GestureDetector(
-                onTap: () => onSuggestionTap(label),
+                onTap: () => onQuestionTap(label),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,

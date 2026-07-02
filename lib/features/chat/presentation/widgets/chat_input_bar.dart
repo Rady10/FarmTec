@@ -24,10 +24,10 @@ class ChatInputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final barBg = isDark ? Pallete.darkBackground : Pallete.background;
-    final fieldBg = isDark ? Pallete.darkSurfaceVariant : const Color(0xFFF3F4F0);
-    final borderClr = isDark ? Pallete.darkOutline : const Color(0xFFE2E3DC);
+    final fieldBg = isDark ? const Color(0xFF1F222B) : Colors.white;
+    final borderClr = isDark ? const Color(0xFF2E313D) : const Color(0xFFDDDEE2);
     final textClr = isDark ? Pallete.darkTextPrimary : Pallete.textPrimary;
-    final hintClr = isDark ? Pallete.darkTextTertiary : Pallete.textHint;
+    final hintClr = isDark ? Pallete.darkTextTertiary : const Color(0xFF8A8F9E);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -43,36 +43,43 @@ class ChatInputBar extends StatelessWidget {
             child: TextField(
               controller: textController,
               focusNode: focusNode,
-              style: AppFonts.font(fontSize: 14, color: textClr),
+              style: AppFonts.font(fontSize: 15, color: textClr),
               cursorColor: isDark ? Pallete.chartGreen : Pallete.primary,
               decoration: InputDecoration(
                 hintText: l.tr('ask_anything'),
-                hintStyle: AppFonts.font(fontSize: 14, color: hintClr),
+                hintStyle: AppFonts.font(fontSize: 15, color: hintClr),
                 filled: true,
                 fillColor: fieldBg,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide(color: borderClr),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: BorderSide(color: borderClr),
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: borderClr, width: 1),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide(
                     color: isDark ? Pallete.chartGreen : Pallete.primary,
-                    width: 1.5,
+                    width: 1.6,
                   ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 14,
+                  horizontal: 20,
+                  vertical: 16,
                 ),
-                prefixIcon: Icon(
-                  Icons.attach_file_rounded,
-                  color: isDark ? Pallete.darkTextTertiary : Pallete.textHint,
-                  size: 20,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 14, right: 10),
+                  child: Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    color: isDark ? Pallete.darkTextTertiary : const Color(0xFF8A8F9E),
+                    size: 22,
+                  ),
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 46,
+                  minHeight: 46,
                 ),
                 isDense: true,
               ),
@@ -85,34 +92,36 @@ class ChatInputBar extends StatelessWidget {
           GestureDetector(
             onTap: isSending ? null : () => onSend(textController.text),
             child: Container(
-              width: 46,
-              height: 46,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: (isDark ? Pallete.chartGreen : Pallete.primary)
-                    .withAlpha(isSending ? 120 : 255),
+                    .withAlpha(isSending ? 140 : 255),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Pallete.primary.withAlpha(40),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    color: Colors.black.withAlpha(isDark ? 24 : 16),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child:
-                  isSending
-                      ? const Padding(
-                        padding: EdgeInsets.all(12),
+              child: Center(
+                child: isSending
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: 2.2,
                           color: Colors.white,
                         ),
                       )
-                      : const Icon(
-                        Icons.arrow_upward_rounded,
+                    : const Icon(
+                        Icons.send_rounded,
                         color: Colors.white,
-                        size: 20,
+                        size: 22,
                       ),
+              ),
             ),
           ),
         ],

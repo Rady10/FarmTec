@@ -25,8 +25,8 @@ const navItems = [
   ),
   NavItem(
     key: 'ai_models',
-    icon: Icons.auto_awesome_outlined,
-    activeIcon: Icons.auto_awesome_rounded,
+    icon: Icons.smart_toy_rounded,
+    activeIcon: Icons.smart_toy_rounded,
   ),
   NavItem(
     key: 'market',

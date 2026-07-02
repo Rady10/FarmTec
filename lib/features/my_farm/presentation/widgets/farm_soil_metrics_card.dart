@@ -4,23 +4,19 @@ import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/my_farm/presentation/widgets/my_farm_card_style.dart';
 import 'package:flutter/material.dart';
 
-class _SoilMetric {
+class _SoilDetail {
   final IconData icon;
   final String labelKey;
   final String value;
-  final String unit;
   final String? statusKey;
   final Color color;
-  final double progress;
 
-  const _SoilMetric({
+  const _SoilDetail({
     required this.icon,
     required this.labelKey,
     required this.value,
-    required this.unit,
     this.statusKey,
     required this.color,
-    required this.progress,
   });
 }
 
@@ -41,126 +37,202 @@ class FarmSoilMetricsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    const metrics = [
-      _SoilMetric(
-        icon: Icons.science_rounded,
+    final details = [
+      _SoilDetail(
+        icon: Icons.thermostat_rounded,
         labelKey: 'ph_level',
-        value: '6.5',
-        unit: '',
-        statusKey: 'medium',
-        color: Color(0xFF9C27B0),
-        progress: 0.65,
+        value: '6.8',
+        statusKey: 'optimal',
+        color: Color(0xFF7CB342),
       ),
-      _SoilMetric(
-        icon: Icons.grain_rounded,
-        labelKey: 'potassium_k',
-        value: '82',
-        unit: 'ppm',
-        color: Color(0xFFFF9800),
-        progress: 0.82,
-      ),
-      _SoilMetric(
-        icon: Icons.water_drop_rounded,
-        labelKey: 'phosphorus_p',
-        value: '45',
-        unit: 'ppm',
-        color: Color(0xFF2196F3),
-        progress: 0.45,
-      ),
-      _SoilMetric(
-        icon: Icons.eco_rounded,
-        labelKey: 'nitrogen_n',
-        value: '48',
-        unit: 'ppm',
+      _SoilDetail(
+        icon: Icons.grass_rounded,
+        labelKey: 'organic_matter',
+        value: '2.9%',
         color: Color(0xFF4CAF50),
-        progress: 0.48,
+      ),
+      _SoilDetail(
+        icon: Icons.eco_rounded,
+        labelKey: 'nitrogen',
+        value: l.tr('medium'),
+        color: Color(0xFF26A69A),
+      ),
+      _SoilDetail(
+        icon: Icons.layers_rounded,
+        labelKey: 'texture',
+        value: 'Loam',
+        color: Color(0xFF42A5F5),
       ),
     ];
 
     return Container(
       decoration: myFarmCardDecoration(isDark, cardColor),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (int i = 0; i < metrics.length; i++) ...[
-              if (i > 0)
-                VerticalDivider(
-                  width: 1,
-                  thickness: 1,
-                  color:
-                      isDark
-                          ? Pallete.darkOutline.withAlpha(80)
-                          : const Color(0xFFE5E7EB),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.tr('soil_analysis_score'),
+            style: AppFonts.font(fontSize: 12, color: subColor),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '74%',
+                      style: AppFonts.font(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l.tr('overall_soil_health'),
+                      style: AppFonts.font(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: subColor,
+                      ),
+                    ),
+                  ],
                 ),
-              Expanded(child: _soilMetricColumn(l, metrics[i])),
+              ),
+              SizedBox(
+                width: 72,
+                height: 72,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CircularProgressIndicator(
+                      value: 0.74,
+                      strokeWidth: 8,
+                      valueColor: AlwaysStoppedAnimation(
+                        isDark ? Colors.greenAccent : const Color(0xFF4CAF50),
+                      ),
+                      backgroundColor: isDark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE8F5E9),
+                    ),
+                    Center(
+                      child: Text(
+                        '74%',
+                        style: AppFonts.font(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _soilDetailTile(l, details[0], textColor, subColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _soilDetailTile(l, details[1], textColor, subColor),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _soilDetailTile(l, details[2], textColor, subColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _soilDetailTile(l, details[3], textColor, subColor),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _soilMetricColumn(AppLocalizations l, _SoilMetric metric) {
-    final unitText = metric.unit.isEmpty ? '' : ' ${l.tr(metric.unit)}';
-    final statusText =
-        metric.statusKey != null ? l.tr(metric.statusKey!) : null;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: Column(
+  Widget _soilDetailTile(
+    AppLocalizations l,
+    _SoilDetail detail,
+    Color textColor,
+    Color subColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.03) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: metric.color.withAlpha(20),
-              borderRadius: BorderRadius.circular(9),
+              color: detail.color.withOpacity(0.16),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(metric.icon, color: metric.color, size: 15),
+            child: Icon(detail.icon, size: 18, color: detail.color),
           ),
-          const SizedBox(height: 6),
-          Text(
-            l.tr(metric.labelKey),
-            style: AppFonts.font(fontSize: 8, color: subColor),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l.convertNumbers(metric.value),
-            style: AppFonts.font(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: textColor,
-            ),
-          ),
-          if (statusText != null)
-            Text(
-              statusText,
-              style: AppFonts.font(
-                fontSize: 8,
-                fontWeight: FontWeight.w600,
-                color: metric.color,
-              ),
-            )
-          else if (unitText.isNotEmpty)
-            Text(
-              unitText.trim(),
-              style: AppFonts.font(fontSize: 8, color: subColor),
-              textAlign: TextAlign.center,
-            ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: metric.progress,
-              minHeight: 4,
-              backgroundColor:
-                  isDark ? Pallete.darkSurfaceVariant : const Color(0xFFEEF2EC),
-              valueColor: AlwaysStoppedAnimation(metric.color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l.tr(detail.labelKey),
+                  style: AppFonts.font(fontSize: 12, color: subColor),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      detail.value,
+                      style: AppFonts.font(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                    ),
+                    if (detail.statusKey != null) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: detail.color.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          l.tr(detail.statusKey!),
+                          style: AppFonts.font(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: detail.color,
+                          ),
+                        ),
+                      ),
+                    ]
+                  ],
+                ),
+              ],
             ),
           ),
         ],

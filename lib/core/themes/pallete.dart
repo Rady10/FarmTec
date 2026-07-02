@@ -39,10 +39,10 @@ abstract class Pallete {
   static const Color textHint = Color(0xFF9CA3AF);
 
   // ── Text Colors — Dark ──────────────────────────────────────────────────────
-  static const Color darkTextPrimary = Color(0xFFF1F1F1);
-  static const Color darkTextSecondary = Color(0xFFB0B0B0);
-  static const Color darkTextTertiary = Color(0xFF787878);
-  static const Color darkTextHint = Color(0xFF555555);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+  static const Color darkTextSecondary = Color(0xFFFFFFFF);
+  static const Color darkTextTertiary = Color(0xFFFFFFFF);
+  static const Color darkTextHint = Color(0xFFDDDDDD);
 
   // ── Semantic / Functional Colors ────────────────────────────────────────────
   static const Color success = Color(0xFF22C55E);

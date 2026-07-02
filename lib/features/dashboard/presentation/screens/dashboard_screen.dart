@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:farmtec/core/themes/app_fonts.dart';
 
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
-import 'package:farmtec/features/dashboard/data/models/dashboard_models.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/add_task_sheet.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/crop_lifecycle_card.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_header.dart';
@@ -14,8 +14,9 @@ import 'package:farmtec/features/dashboard/presentation/widgets/profit_calculato
 import 'package:farmtec/features/dashboard/presentation/widgets/soil_card.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/task_tile.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/weather_card.dart';
-import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_section_card.dart';
+import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
+import 'package:farmtec/features/dashboard/data/models/dashboard_models.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -31,11 +32,29 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   late Future<List<Map<String, dynamic>>> _pricesFuture;
   String? _pricesCrop;
+  late final PageController _advicePageController;
+  int _activeAdvicePage = 0;
+  Timer? _adviceTimer;
 
-  static const _soil = [
-    SoilMetricModel(label: 'nitrogen_n', value: '98 ppm', progress: 0.98),
-    SoilMetricModel(label: 'phosphorus_p', value: '46 ppm', progress: 0.46),
-    SoilMetricModel(label: 'potassium_k', value: '92 ppm', progress: 0.92),
+  static const _adviceKeys = [
+    'advice_crop_rotation',
+    'advice_irrigation_practices',
+    'advice_soil_fertility',
+    'advice_pest_monitoring',
+  ];
+
+  static const _adviceImages = [
+    'assets/images/crop_rec.png',
+    'assets/images/irri.png',
+    'assets/images/plant.png',
+    'assets/images/market_illus.png',
+  ];
+
+  static const _soilMetrics = <SoilMetricModel>[
+    SoilMetricModel(label: 'ph_level', value: '6.8', progress: 0.68),
+    SoilMetricModel(label: 'organic_matter', value: '2.9%', progress: null),
+    SoilMetricModel(label: 'nitrogen', value: 'Medium', progress: null),
+    SoilMetricModel(label: 'texture', value: 'Loam', progress: null),
   ];
 
   String? _loadedFarmId;
@@ -74,6 +93,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _saveTasks(String farmId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('tasks_$farmId', jsonEncode(_tasks));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _advicePageController = PageController(viewportFraction: 0.94);
+    _adviceTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!_advicePageController.hasClients) return;
+      final nextPage = (_activeAdvicePage + 1) % _adviceKeys.length;
+      _advicePageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _adviceTimer?.cancel();
+    _advicePageController.dispose();
+    super.dispose();
   }
 
   void _ensurePricesLoaded(String crop) {
@@ -244,16 +285,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 14),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: isDark ? cardColor : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.06),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.lightbulb_outline_rounded,
+                        color: Pallete.primary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l.tr('farming_advice_tips'),
+                      style: AppFonts.font(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 180,
+                child: PageView.builder(
+                  controller: _advicePageController,
+                  itemCount: _adviceKeys.length,
+                  onPageChanged: (page) => setState(() => _activeAdvicePage = page),
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.asset(
+                              _adviceImages[index],
+                              fit: BoxFit.cover,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(0.18),
+                                    Colors.black.withOpacity(0.60),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 18,
+                              right: 18,
+                              bottom: 18,
+                              child: Text(
+                                l.tr(_adviceKeys[index]),
+                                style: AppFonts.font(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                      offset: Offset(0, 2),
+                                      blurRadius: 8,
+                                      color: Colors.black26,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _adviceKeys.length,
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    width: _activeAdvicePage == index ? 18 : 6,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      color: _activeAdvicePage == index
+                          ? (isDark ? Pallete.chartGreen : Pallete.primary)
+                          : (isDark ? const Color(0xFF4B4F5E) : const Color(0xFFD3D7DE)),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
               DashboardSectionCard(
-                icon: Icons.grass_rounded,
+                icon: Icons.terrain_rounded,
                 title: l.tr('soil_metrics'),
                 titleColor: textColor,
                 isDark: isDark,
                 cardColor: cardColor,
                 child: SoilCard(
-                  metrics: _soil,
+                  metrics: _soilMetrics,
                   isDark: isDark,
                   textColor: textColor,
+                  overallHealth: 0.74,
+                  overallValue: '74%',
+                  overallLabelKey: 'overall_soil_health',
                 ),
               ),
               const SizedBox(height: 14),

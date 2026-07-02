@@ -183,9 +183,8 @@ class _FarmBrainChatScreenState extends State<FarmBrainChatScreen>
     final l = AppLocalizations.of(context);
     final bgColor = colors.background;
     final cardColor = colors.card;
-    final textColor = isDark ? colors.iconAccent : colors.textPrimary;
     final topPadding = MediaQuery.of(context).padding.top;
-    final showSuggestions = _messages.length <= 2;
+    final showQuestionChips = _messages.length <= 2;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -260,7 +259,7 @@ class _FarmBrainChatScreenState extends State<FarmBrainChatScreen>
                               style: AppFonts.font(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
+                                color: context.screenHeaderTitle,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -312,11 +311,11 @@ class _FarmBrainChatScreenState extends State<FarmBrainChatScreen>
                           },
                         ),
                       ),
-                      if (showSuggestions)
-                        ChatSuggestions(
+                      if (showQuestionChips)
+                        ChatQuestions(
                           isDark: isDark,
                           l: l,
-                          onSuggestionTap: _sendMessage,
+                          onQuestionTap: _sendMessage,
                         ),
                     ],
                   ),

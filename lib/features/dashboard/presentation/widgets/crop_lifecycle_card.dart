@@ -75,7 +75,7 @@ class CropLifecycleCard extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '${l.tr(CropLifecycleService.cropL10nKey(crop))} • ${status.currentStage.name}',
+          '${l.tr(CropLifecycleService.cropL10nKey(crop))} • ${_stageTitle(l, status.currentStage.name)}',
           textAlign: TextAlign.center,
           style: AppFonts.font(
             fontSize: 13,
@@ -120,6 +120,11 @@ class CropLifecycleCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _stageTitle(AppLocalizations l, String stageName) {
+    final key = 'stage_${stageName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
+    return l.trOr(key, stageName);
   }
 }
 

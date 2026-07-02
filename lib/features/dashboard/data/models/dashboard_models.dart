@@ -23,12 +23,12 @@ class WeatherModel {
 class SoilMetricModel {
   final String label;
   final String value;
-  final double progress;
+  final double? progress;
 
   const SoilMetricModel({
     required this.label,
     required this.value,
-    required this.progress,
+    this.progress,
   });
 }
 

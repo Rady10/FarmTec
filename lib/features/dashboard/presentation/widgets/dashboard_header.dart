@@ -123,14 +123,11 @@ class DashboardHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: Center(
-              child: Text(
-                _getInitial(farmName),
-                style: AppFonts.font(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
+            child: const Center(
+              child: Icon(
+                Icons.person_rounded,
+                size: 22,
+                color: Colors.white,
               ),
             ),
           ),

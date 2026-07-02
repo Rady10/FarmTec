@@ -3,6 +3,7 @@ import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/chat/data/models/chat_message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessage message;
@@ -106,13 +107,37 @@ class ChatMessageBubble extends StatelessWidget {
                     color: bubbleColor,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(
-                    displayText,
-                    style: AppFonts.font(
-                      fontSize: 14,
-                      color: textClr,
-                      height: 1.6,
+                  child: MarkdownBody(
+                    data: displayText,
+                    selectable: false,
+                    styleSheet: MarkdownStyleSheet(
+                      p: AppFonts.font(
+                        fontSize: 14,
+                        color: textClr,
+                        height: 1.6,
+                      ),
+                      strong: AppFonts.font(
+                        fontSize: 14,
+                        color: textClr,
+                        fontWeight: FontWeight.w700,
+                        height: 1.6,
+                      ),
+                      em: AppFonts.font(
+                        fontSize: 14,
+                        color: textClr,
+                        fontStyle: FontStyle.italic,
+                        height: 1.6,
+                      ),
+                      code: AppFonts.font(
+                        fontSize: 14,
+                        color: textClr,
+                        backgroundColor: isDark ? const Color(0xFF1E1F28) : const Color(0xFFEFEFF2),
+                        height: 1.6,
+                      ),
                     ),
+                    softLineBreak: true,
+                    fitContent: true,
+                    imageBuilder: (uri, title, alt) => const SizedBox.shrink(),
                   ),
                 ),
               ],

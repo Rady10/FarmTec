@@ -39,7 +39,8 @@ class FarmbrainChatService {
       throw const FarmbrainChatException('Unexpected API response format');
     }
 
-    final reply = body['response'];
+    var reply = body['answer'];
+    reply ??= body['response'];
     if (reply is! String || reply.trim().isEmpty) {
       throw const FarmbrainChatException('Empty response from assistant');
     }

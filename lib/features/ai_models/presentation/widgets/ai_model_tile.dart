@@ -28,14 +28,19 @@ class AiModelTile extends StatelessWidget {
   Color get _iconBgColor {
     switch (model.icon) {
       case Icons.eco_rounded:
+      case Icons.agriculture_rounded:
         return const Color(0xFF2D6A4F); // green
       case Icons.bar_chart_rounded:
+      case Icons.trending_up_rounded:
         return const Color(0xFF1565C0); // blue
       case Icons.water_rounded:
+      case Icons.water_drop_rounded:
         return const Color(0xFF00897B); // teal
       case Icons.show_chart_rounded:
+      case Icons.insights_rounded:
         return const Color(0xFF2E7D32); // dark green
       case Icons.biotech_rounded:
+      case Icons.bug_report_rounded:
         return const Color(0xFF6A994E); // plant green
       default:
         return Pallete.primary;

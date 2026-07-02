@@ -9,23 +9,31 @@ class SoilCard extends StatelessWidget {
   final List<SoilMetricModel> metrics;
   final bool isDark;
   final Color textColor;
+  final double overallHealth;
+  final String overallValue;
+  final String overallLabelKey;
 
   const SoilCard({
     super.key,
     required this.metrics,
     required this.isDark,
     required this.textColor,
+    required this.overallHealth,
+    required this.overallValue,
+    required this.overallLabelKey,
   });
 
   static const _icons = [
-    Icons.eco_rounded,
+    Icons.thermostat_rounded,
     Icons.water_drop_rounded,
+    Icons.eco_rounded,
     Icons.grain_rounded,
   ];
 
   static const _colors = [
+    Color(0xFF7CB342),
     Color(0xFF4CAF50),
-    Color(0xFF2196F3),
+    Color(0xFF26A69A),
     Color(0xFFFF9800),
   ];
 
@@ -40,7 +48,13 @@ class SoilCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          MoistureGauge(isDark: isDark, textColor: textColor),
+          MoistureGauge(
+            isDark: isDark,
+            textColor: textColor,
+            progress: overallHealth,
+            value: overallValue,
+            label: l.tr(overallLabelKey),
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -83,19 +97,21 @@ class SoilCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: metric.progress,
-                          minHeight: 5,
-                          backgroundColor:
-                              isDark
-                                  ? Pallete.darkSurfaceVariant
-                                  : const Color(0xFFEEF2EC),
-                          valueColor: AlwaysStoppedAnimation(_colors[i]),
+                      if (metric.progress != null) ...[
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: metric.progress,
+                            minHeight: 5,
+                            backgroundColor:
+                                isDark
+                                    ? Pallete.darkSurfaceVariant
+                                    : const Color(0xFFEEF2EC),
+                            valueColor: AlwaysStoppedAnimation(_colors[i]),
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 );

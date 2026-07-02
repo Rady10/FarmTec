@@ -7,16 +7,21 @@ import 'package:flutter/material.dart';
 class MoistureGauge extends StatelessWidget {
   final bool isDark;
   final Color textColor;
+  final double progress;
+  final String value;
+  final String label;
 
   const MoistureGauge({
     super.key,
     required this.isDark,
     required this.textColor,
+    required this.progress,
+    required this.value,
+    required this.label,
   });
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
     return SizedBox(
       width: 78,
       child: Column(
@@ -25,10 +30,10 @@ class MoistureGauge extends StatelessWidget {
             width: 68,
             height: 68,
             child: CustomPaint(
-              painter: MoistureCirclePainter(0.74, isDark),
+              painter: MoistureCirclePainter(progress, isDark),
               child: Center(
                 child: Text(
-                  l.convertNumbers('74%'),
+                  value,
                   style: AppFonts.font(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -40,7 +45,7 @@ class MoistureGauge extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            l.tr('moisture'),
+            label,
             textAlign: TextAlign.center,
             style: AppFonts.font(
               fontSize: 9,

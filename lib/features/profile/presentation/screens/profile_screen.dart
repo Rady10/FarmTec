@@ -235,21 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const Color(0xFF2196F3),
                               isDark: isDark,
                             ),
-                            Container(
-                              width: 1,
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              color:
-                                  isDark
-                                      ? colors.outline
-                                      : Pallete.neutral200,
-                            ),
-                            ProfileStatCard(
-                              l.convertNumbers('87%'),
-                              l.tr('efficiency'),
-                              Icons.trending_up_rounded,
-                              const Color(0xFFFF9800),
-                              isDark: isDark,
-                            ),
                           ],
                         ),
                       ),
