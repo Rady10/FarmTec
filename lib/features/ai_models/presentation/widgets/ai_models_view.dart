@@ -82,7 +82,7 @@ class AIModelsView extends StatelessWidget {
     ),
     AIModelDefinition(
       name: 'Irrigation Planner',
-      desc: 'Calculates irrigation needs from GPS coordinates',
+      desc: 'Calculates irrigation needs from GPS coordinates, crop, and year',
       icon: Icons.water_drop_rounded,
       backgroundImage: 'assets/images/irri.png',
       apiUrl: 'https://B1R-14N15-irrigation.hf.space/predict',
@@ -99,15 +99,34 @@ class AIModelsView extends StatelessWidget {
           hint: '31.2357',
           type: TextInputType.numberWithOptions(decimal: true),
         ),
+        AIModelFieldDefinition(
+          key: 'crop',
+          label: 'Crop',
+          hint: 'Wheat',
+          type: TextInputType.text,
+        ),
+        AIModelFieldDefinition(
+          key: 'year',
+          label: 'Year',
+          hint: '2026',
+          type: TextInputType.number,
+        ),
       ],
     ),
     AIModelDefinition(
       name: 'Market Forecast',
-      desc: 'Commodity price forecast from live market data',
+      desc: 'Select a crop and forecast its market price in Egyptian pound',
       icon: Icons.insights_rounded,
       backgroundImage: 'assets/images/prices.png',
       apiUrl: 'https://b1r-14n15-forecast.hf.space/forecast',
-      fields: [],
+      fields: [
+        AIModelFieldDefinition(
+          key: 'crop',
+          label: 'Crop',
+          hint: 'Wheat',
+          type: TextInputType.text,
+        ),
+      ],
     ),
   ];
 

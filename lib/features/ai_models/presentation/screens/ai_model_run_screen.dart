@@ -7,6 +7,8 @@ import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/services/plant_disease_vision_service.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
+import 'package:farmtec/core/services/crop_lifecycle_service.dart';
+import 'package:farmtec/features/dashboard/presentation/utils/market_crop_utils.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_background.dart';
@@ -36,11 +38,11 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   bool _isError = false;
 
   static const _statValues = {
-    'Disease Detection': {'accuracy': '91%', 'speed': '3.5s', 'runs': '1.8K'},
-    'Crop Recommendation': {'accuracy': '94%', 'speed': '1.2s', 'runs': '2.4K'},
-    'Yield Prediction': {'accuracy': '92%', 'speed': '1.5s', 'runs': '5.6K'},
-    'Irrigation Planner': {'accuracy': '93%', 'speed': '1.8s', 'runs': '3.2K'},
-    'Market Forecast': {'accuracy': '89%', 'speed': '0.6s', 'runs': '12K'},
+    'Disease Detection': {'last_scan': 'Today'},
+    'Crop Recommendation': {'last_scan': 'Today'},
+    'Yield Prediction': {'last_scan': 'Today'},
+    'Irrigation Planner': {'last_scan': 'Today'},
+    'Market Forecast': {'last_scan': 'Today'},
   };
 
   @override
@@ -83,16 +85,17 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
       maxWidth: 1600,
       imageQuality: 85,
     );
-    if (image != null && mounted) {
-      setState(() => _selectedImage = image);
-    }
+    if (image == null) return;
+    if (!mounted) return;
+    setState(() => _selectedImage = image);
   }
 
   Future<void> _runPrediction() async {
+    final l = AppLocalizations.of(context);
     if (widget.model.isVisionModel && _selectedImage == null) {
       setState(() {
         _isError = true;
-        _result = AppLocalizations.of(context).tr('photo_required');
+        _result = l.tr('photo_required');
       });
       return;
     }
@@ -114,74 +117,105 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         _result = analysis;
         await _persistResult(analysis);
       } else {
-        await _runStandardPrediction();
+        await _runStandardPrediction(l);
       }
     } catch (_) {
       if (!mounted) return;
       _isError = true;
-      _result = AppLocalizations.of(context).tr('connection_error');
+      _result = l.tr('connection_error');
     }
     if (mounted) setState(() => _loading = false);
   }
 
-  Future<void> _runStandardPrediction() async {
+  String _formatEgp(num rawValue, AppLocalizations l) {
+    final formatted = l.convertNumbers(rawValue.toStringAsFixed(2));
+    return l.isArabic
+        ? 'ج.م$formatted${l.tr('per_ton')}'
+        : 'EGP $formatted${l.tr('per_ton')}';
+  }
+
+  Future<void> _runStandardPrediction(AppLocalizations l) async {
     http.Response response;
-      if (widget.model.name == 'Market Forecast') {
-        response = await http
-            .get(Uri.parse(widget.model.apiUrl))
-            .timeout(const Duration(seconds: 15));
-      } else if (widget.model.name == 'Irrigation Planner') {
-        final body = <String, dynamic>{};
-        for (final f in widget.model.fields) {
-          final val = _controllers[f.key]!.text.isNotEmpty
-              ? _controllers[f.key]!.text
-              : f.hint;
-          body[f.key] = double.tryParse(val) ?? val;
-        }
-        response = await http
-            .post(
-              Uri.parse(widget.model.apiUrl),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({'data': body}),
-            )
-            .timeout(const Duration(seconds: 15));
-      } else {
-        final body = <String, dynamic>{};
-        for (final f in widget.model.fields) {
-          final val = _controllers[f.key]!.text.isNotEmpty
-              ? _controllers[f.key]!.text
-              : f.hint;
-          if (f.key == 'year') {
-            body[f.key] = int.tryParse(val) ?? val;
-          } else if (f.type == TextInputType.number ||
-              f.type ==
-                  const TextInputType.numberWithOptions(decimal: true)) {
-            body[f.key] = double.tryParse(val) ?? val;
-          } else {
-            body[f.key] = val;
-          }
-        }
-        response = await http
-            .post(
-              Uri.parse(widget.model.apiUrl),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(body),
-            )
-            .timeout(const Duration(seconds: 15));
-      }
+    if (widget.model.name == 'Market Forecast') {
+      final selectedCrop = _controllers['crop']?.text.trim() ?? '';
+      response = await http
+          .get(Uri.parse(widget.model.apiUrl))
+          .timeout(const Duration(seconds: 30));
       if (!mounted) return;
       if (response.statusCode == 200) {
         final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-        _result = _fmt(decoded, AppLocalizations.of(context));
-        if (mounted) await _persistResult(decoded);
-      } else {
+        if (decoded is List) {
+          final filtered = selectedCrop.isNotEmpty
+              ? decoded.where((item) {
+                  final commodity = '${item['commodity'] ?? ''}';
+                  return MarketCropUtils.matchesCommodity(commodity, selectedCrop);
+                }).toList()
+              : decoded;
+          _result = _fmt(filtered, l);
+          if (mounted) await _persistResult(filtered);
+          return;
+        }
         _isError = true;
-        final l = AppLocalizations.of(context);
-        _result = l.trParams(
-          'api_error',
-          {'code': response.statusCode.toString()},
-        );
+        _result = l.tr('connection_error');
+        return;
       }
+      _isError = true;
+      _result = l.trParams(
+        'api_error',
+        {'code': response.statusCode.toString()},
+      );
+      return;
+    } else if (widget.model.name == 'Irrigation Planner') {
+      final body = <String, dynamic>{};
+      for (final f in widget.model.fields) {
+        final val = _controllers[f.key]!.text.isNotEmpty
+            ? _controllers[f.key]!.text
+            : f.hint;
+        body[f.key] = double.tryParse(val) ?? val;
+      }
+      response = await http
+          .post(
+            Uri.parse(widget.model.apiUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+    } else {
+      final body = <String, dynamic>{};
+      for (final f in widget.model.fields) {
+        final val = _controllers[f.key]!.text.isNotEmpty
+            ? _controllers[f.key]!.text
+            : f.hint;
+        if (f.key == 'year') {
+          body[f.key] = int.tryParse(val) ?? val;
+        } else if (f.type == TextInputType.number ||
+            f.type ==
+                const TextInputType.numberWithOptions(decimal: true)) {
+          body[f.key] = double.tryParse(val) ?? val;
+        } else {
+          body[f.key] = val;
+        }
+      }
+      response = await http
+          .post(
+            Uri.parse(widget.model.apiUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+    }
+    if (!mounted) return;
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      _result = _fmt(decoded, l);
+      if (mounted) await _persistResult(decoded);
+    } else {
+      _isError = true;
+      _result = l.trParams(
+        'api_error',
+        {'code': response.statusCode.toString()},
+      );
+    }
   }
 
   String? _titleKeyForModel(String name) {
@@ -215,11 +249,14 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   }
 
   Future<void> _persistResult(dynamic decoded) async {
-    final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
+    final farmProvider = Provider.of<FarmProvider>(context, listen: false);
+    final yieldService = Provider.of<YieldPredictionService>(context, listen: false);
+    final historyService = Provider.of<FarmHistoryService>(context, listen: false);
+    final farm = farmProvider.selectedFarm;
     final summary = _result ?? decoded.toString();
 
     if (farm != null) {
-      await Provider.of<FarmHistoryService>(context, listen: false).addOperation(
+      await historyService.addOperation(
         FarmOperation(
           id: 'op_${DateTime.now().microsecondsSinceEpoch}',
           farmId: farm.id,
@@ -241,10 +278,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
               _controllers['crop']?.text.trim().isNotEmpty == true
                   ? _controllers['crop']!.text.trim()
                   : (farm?.crop ?? 'Wheat');
-          await Provider.of<YieldPredictionService>(
-            context,
-            listen: false,
-          ).updatePrediction(
+          await yieldService.updatePrediction(
             yieldPerHa: yieldVal,
             crop: crop,
             field: farm?.name ?? crop,
@@ -287,7 +321,13 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
       case 'Market Forecast':
         if (d is List && d.isNotEmpty) {
           return l.convertNumbers(
-            '📈 Forecast:\n${d.take(5).map((e) => '  • ${e['commodity']}: \$${(e['price'] as num).toStringAsFixed(2)}${l.tr('per_ton')}').join('\n')}',
+            '📈 Forecast:\n${d.take(5).map((e) {
+              final rawPrice = e['price'];
+              final num priceNum = rawPrice is num
+                  ? rawPrice
+                  : num.tryParse(rawPrice?.toString() ?? '0') ?? 0;
+              return '  • ${e['commodity']}: ${_formatEgp(priceNum, l)}';
+            }).join('\n')}',
           );
         }
         return '📈 $d';
@@ -310,11 +350,9 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         '${widget.model.name.toLowerCase().replaceAll(' ', '_')}_desc';
     final desc = l.tr(descKey);
     final statValues = _statValues[widget.model.name] ??
-        {'accuracy': '90%', 'speed': '1s', 'runs': '1K'};
+        {'last_scan': l.tr('last_scan')};
     final stats = {
-      l.tr('stat_accuracy'): l.convertNumbers(statValues['accuracy']!),
-      l.tr('stat_speed'): l.convertNumbers(statValues['speed']!),
-      l.tr('stat_runs'): l.convertNumbers(statValues['runs']!),
+      l.tr('last_scan'): l.convertNumbers(statValues['last_scan']!),
     };
     const accentGreen = Pallete.aiModelGreen;
 
@@ -380,26 +418,25 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(25),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          widget.model.isVisionModel
-                              ? l.tr('vision_model_badge')
-                              : 'FarmBrain ML · HuggingFace',
-                          style: AppFonts.font(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white70,
+                      if (widget.model.isVisionModel)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(25),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            l.tr('vision_model_badge'),
+                            style: AppFonts.font(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -545,54 +582,109 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                     ),
                     const SizedBox(height: 14),
                     ...widget.model.fields.map(
-                      (f) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: TextField(
-                          controller: _controllers[f.key],
-                          keyboardType: f.type,
-                          style: AppFonts.font(
-                            fontSize: 14,
-                            color: textColor,
-                          ),
-                          decoration: InputDecoration(
-                            labelText: f.label == 'Latitude'
-                                ? l.tr('latitude')
-                                : f.label == 'Longitude'
-                                    ? l.tr('longitude')
-                                    : f.label == 'Year'
-                                        ? l.tr('year')
-                                        : f.label == 'Crop'
-                                            ? l.tr('crop_type')
-                                            : f.label,
-                            hintText: f.hint,
-                            labelStyle: AppFonts.font(
-                              fontSize: 13,
-                              color: subColor,
-                            ),
-                            hintStyle: AppFonts.font(
-                              fontSize: 13,
-                              color: colors.textHint,
-                            ),
-                            filled: true,
-                            fillColor: fillColor,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: accentGreen,
-                                width: 1.5,
+                      (f) {
+                        if (widget.model.name == 'Market Forecast' && f.key == 'crop') {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: DropdownButtonFormField<String>(
+                              initialValue: _controllers[f.key]!.text.isNotEmpty
+                                  ? _controllers[f.key]!.text
+                                  : null,
+                              items: CropLifecycleService.availableCrops
+                                  .map(
+                                    (crop) => DropdownMenuItem(
+                                      value: crop,
+                                      child: Text(
+                                        l.tr(CropLifecycleService.cropL10nKey(crop)),
+                                        style: AppFonts.font(fontSize: 14),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _controllers[f.key]!.text = value;
+                                  });
+                                }
+                              },
+
+                              decoration: InputDecoration(
+                                labelText: l.tr('crop_type'),
+                                labelStyle: AppFonts.font(
+                                  fontSize: 13,
+                                  color: subColor,
+                                ),
+                                filled: true,
+                                fillColor: fillColor,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide(
+                                    color: accentGreen,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 16,
+                                ),
                               ),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
+                          );
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: TextField(
+                            controller: _controllers[f.key],
+                            keyboardType: f.type,
+                            style: AppFonts.font(
+                              fontSize: 14,
+                              color: textColor,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: f.label == 'Latitude'
+                                  ? l.tr('latitude')
+                                  : f.label == 'Longitude'
+                                      ? l.tr('longitude')
+                                      : f.label == 'Year'
+                                          ? l.tr('year')
+                                          : f.label == 'Crop'
+                                              ? l.tr('crop_type')
+                                              : f.label,
+                              hintText: f.hint,
+                              labelStyle: AppFonts.font(
+                                fontSize: 13,
+                                color: subColor,
+                              ),
+                              hintStyle: AppFonts.font(
+                                fontSize: 13,
+                                color: colors.textHint,
+                              ),
+                              filled: true,
+                              fillColor: fillColor,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(
+                                  color: accentGreen,
+                                  width: 1.5,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
                   const SizedBox(height: 8),

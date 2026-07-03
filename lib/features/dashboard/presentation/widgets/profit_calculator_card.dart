@@ -31,9 +31,14 @@ class ProfitCalculatorCard extends StatelessWidget {
 
     final estimatedYield = yieldPrediction.yieldPerHa;
     final totalProfit = estimatedYield * marketPrice;
-    final rawUnit =
-        yieldPrediction.unit.replaceAll('/ha', '').trim().toLowerCase();
-    final unitLabel = l.trOr(rawUnit, rawUnit);
+    final normalizedUnit = yieldPrediction.unit.trim().toLowerCase();
+    final unitLabel =
+        normalizedUnit.contains('feddan') ||
+                normalizedUnit.contains('ton') ||
+                normalizedUnit.contains('tonne') ||
+                normalizedUnit.contains('t/ha')
+            ? l.tr('tonnes_per_feddan')
+            : l.trOr(normalizedUnit, normalizedUnit);
     final priceLabel =
         l.isArabic
             ? '${l.convertNumbers(marketPrice.toStringAsFixed(2))} د.إ${l.tr('per_ton')}'

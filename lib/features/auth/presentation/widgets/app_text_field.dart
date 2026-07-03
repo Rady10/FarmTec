@@ -1,9 +1,8 @@
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class AppTextField extends StatelessWidget {
+class AppTextField extends StatefulWidget {
   final String hint;
   final TextInputType type;
   final bool obscure;
@@ -13,6 +12,8 @@ class AppTextField extends StatelessWidget {
   final Color fillColor;
   final Color borderColor;
   final Color textColor;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const AppTextField({
     super.key,
@@ -25,48 +26,95 @@ class AppTextField extends StatelessWidget {
     required this.fillColor,
     required this.borderColor,
     required this.textColor,
+    this.controller,
+    this.validator,
   });
+
+  @override
+  State<AppTextField> createState() => _AppTextFieldState();
+}
+
+class _AppTextFieldState extends State<AppTextField> {
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleFocusChange() {
+    setState(() {
+      _isFocused = _focusNode.hasFocus;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      obscureText: obscure,
-      keyboardType: type,
-      style: AppFonts.font(fontSize: 14, color: textColor),
+      controller: widget.controller,
+      focusNode: _focusNode,
+      obscureText: widget.obscure,
+      keyboardType: widget.type,
+      style: AppFonts.font(fontSize: 14, color: widget.textColor),
       decoration: InputDecoration(
-        hintText: hint,
+        hintText: widget.hint,
         hintStyle: AppFonts.font(fontSize: 14, color: Pallete.textHint),
         filled: true,
-        fillColor: fillColor,
-        suffixIcon: suffix,
-        prefixIcon: prefix,
+        fillColor: widget.fillColor.withAlpha(50),
+        suffixIcon: widget.suffix,
+        prefixIcon: widget.prefix,
         prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.transparent,
+            width: 0,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Colors.transparent,
+            width: 0,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Pallete.primary, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Pallete.primary,
+            width: 2,
+          ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Pallete.error, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Pallete.error,
+            width: 1.5,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Pallete.error, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Pallete.error,
+            width: 1.5,
+          ),
         ),
       ),
-      validator: isRequired
-          ? (v) => (v == null || v.isEmpty) ? 'Required' : null
-          : null,
+      validator: widget.validator ??
+          (widget.isRequired
+              ? (v) => (v == null || v.isEmpty) ? 'Required' : null
+              : null),
     );
   }
 }

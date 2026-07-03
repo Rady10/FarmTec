@@ -412,7 +412,7 @@ class _FarmLocationCardState extends State<FarmLocationCard> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'NDVI',
+                              l.tr('vegetation_health'),
                               style: AppFonts.font(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
