@@ -117,6 +117,16 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
             opacity: fadeOutOpacity.clamp(0.0, 1.0),
             child: Stack(
               children: [
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.75,
+                    child: Image.asset(
+                      'assets/images/splash_illus.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
                 SplashParticles(
                   particleAnimation: _particleCtrl,
                   iconScale: _iconScale,

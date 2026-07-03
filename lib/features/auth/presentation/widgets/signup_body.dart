@@ -1,13 +1,9 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
-import 'package:farmtec/core/utils/assets.dart';
 import 'package:farmtec/features/auth/presentation/screens/login_screen.dart';
 import 'package:farmtec/features/auth/presentation/widgets/app_text_field.dart';
-import 'package:farmtec/features/auth/presentation/widgets/farm_tec_logo.dart';
-import 'package:farmtec/features/auth/presentation/widgets/field_label.dart';
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg.dart';
 
 class SignupBody extends StatefulWidget {
   const SignupBody({super.key});
@@ -49,7 +45,7 @@ class _SignupBodyState extends State<SignupBody>
     final borderColor = isDark ? Pallete.darkOutline : const Color(0xFFE6E9E9);
 
     return Scaffold(
-      backgroundColor: isDark ? Pallete.darkBackground : Pallete.background,
+      backgroundColor: isDark ? Pallete.darkBackground : const Color(0xFFF4F6F4),
       body: Stack(
         children: [
           // Background image
@@ -75,137 +71,149 @@ class _SignupBodyState extends State<SignupBody>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 16),
-                            FarmTecLogo(isDark: isDark),
+                            // Top Header Logo (no back button)
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Pallete.primary,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'FarmTec',
+                                    style: AppFonts.font(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark ? Pallete.darkTextPrimary : Pallete.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            // Centered Title & Subtitle matching mockup
+                            Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        l.tr('create_account'),
+                                        style: AppFonts.font(
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.w800,
+                                          color: textColor,
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Icon(
+                                        Icons.spa_rounded,
+                                        color: Pallete.primary,
+                                        size: 28,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    l.tr('sign_up_subtitle'),
+                                    textAlign: TextAlign.center,
+                                    style: AppFonts.font(
+                                      fontSize: 13,
+                                      color: subColor,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 32),
-                            Text(
-                              l.tr('create_account'),
-                              style: AppFonts.font(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: textColor,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              l.tr('sign_up_subtitle'),
-                              style: AppFonts.font(
-                                fontSize: 14,
-                                color: subColor,
-                                height: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
                             Form(
                               key: _formKey,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldLabel(
-                                    text: l.tr('full_name'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(height: 8),
                                   AppTextField(
+                                    label: l.tr('full_name'),
                                     hint: 'Ahmed Rady',
                                     type: TextInputType.name,
+                                    icon: Icons.person_outline_rounded,
                                     fillColor: fillColor,
                                     borderColor: borderColor,
                                     textColor: textColor,
                                   ),
                                   const SizedBox(height: 16),
-                                  FieldLabel(
-                                    text: l.tr('email_address'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(height: 8),
                                   AppTextField(
+                                    label: l.tr('email_address'),
                                     hint: 'farm@example.com',
                                     type: TextInputType.emailAddress,
+                                    icon: Icons.mail_outline_rounded,
                                     fillColor: fillColor,
                                     borderColor: borderColor,
                                     textColor: textColor,
                                   ),
                                   const SizedBox(height: 16),
-                                  FieldLabel(
-                                    text: l.tr('phone_number'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(height: 8),
                                   AppTextField(
-                                    hint: '+20 1234567890',
+                                    label: l.tr('phone_number'),
+                                    hint: '+20 123 456 7890',
                                     type: TextInputType.phone,
+                                    icon: Icons.phone_outlined,
                                     fillColor: fillColor,
                                     borderColor: borderColor,
                                     textColor: textColor,
-                                    prefix: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 14,
-                                        right: 8,
-                                      ),
-                                      child: Icon(
-                                        Icons.phone_rounded,
-                                        size: 18,
-                                        color: Pallete.textHint,
-                                      ),
-                                    ),
                                   ),
                                   const SizedBox(height: 16),
-                                  FieldLabel(
-                                    text: l.tr('location_region'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(height: 8),
                                   AppTextField(
+                                    label: l.tr('location_region'),
                                     hint: 'Cairo, Egypt',
                                     type: TextInputType.text,
+                                    icon: Icons.location_on_outlined,
                                     fillColor: fillColor,
                                     borderColor: borderColor,
                                     textColor: textColor,
-                                    prefix: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 14,
-                                        right: 8,
-                                      ),
-                                      child: Icon(
-                                        Icons.location_on_rounded,
-                                        size: 18,
-                                        color: Pallete.textHint,
-                                      ),
+                                    suffix: Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Pallete.textHint,
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  FieldLabel(
-                                    text: l.tr('password'),
-                                    color: textColor,
-                                  ),
-                                  const SizedBox(height: 8),
                                   AppTextField(
+                                    label: l.tr('password'),
                                     hint: '••••••••',
                                     type: TextInputType.visiblePassword,
                                     obscure: _obscurePassword,
+                                    icon: Icons.lock_outline_rounded,
                                     fillColor: fillColor,
                                     borderColor: borderColor,
                                     textColor: textColor,
                                     suffix: GestureDetector(
                                       onTap: () => setState(
-                                        () =>
-                                            _obscurePassword = !_obscurePassword,
+                                        () => _obscurePassword = !_obscurePassword,
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12),
-                                        child: SvgPicture.asset(
-                                          Assets.eyeIcon,
-                                          width: 20,
-                                          height: 20,
-                                        ),
+                                      child: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off_outlined
+                                            : Icons.visibility_outlined,
+                                        color: Pallete.textHint,
+                                        size: 20,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 32),
+                            // Action Button
                             SizedBox(
                               width: double.infinity,
                               height: 54,
@@ -215,83 +223,126 @@ class _SignupBodyState extends State<SignupBody>
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                onPressed: () {},
-                                child: Text(
-                                  l.tr('signup_button'),
-                                  style: AppFonts.font(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Center(
-                              child: RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  text: l.tr('terms_prefix'),
-                                  style: AppFonts.font(
-                                    fontSize: 12,
-                                    color: subColor,
-                                  ),
+                                onPressed: () {
+                                  if (_formKey.currentState?.validate() ?? false) {
+                                    // Submit Form
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    TextSpan(
-                                      text: l.tr('terms_of_service'),
-                                      style: AppFonts.font(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: Pallete.accent,
-                                      ),
+                                    Icon(
+                                      Icons.spa_rounded,
+                                      color: Colors.white.withOpacity(0.9),
+                                      size: 20,
                                     ),
-                                    TextSpan(text: l.tr('and')),
-                                    TextSpan(
-                                      text: l.tr('privacy_policy'),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      l.tr('signup_button'),
                                       style: AppFonts.font(
-                                        fontSize: 12,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w700,
-                                        color: Pallete.accent,
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    text: l.tr('terms_prefix'),
+                                    style: AppFonts.font(
+                                      fontSize: 12,
+                                      color: subColor,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: l.tr('terms_of_service'),
+                                        style: AppFonts.font(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark ? Pallete.accent : const Color(0xFFEAA610),
+                                        ),
+                                      ),
+                                      TextSpan(text: l.tr('and')),
+                                      TextSpan(
+                                        text: l.tr('privacy_policy'),
+                                        style: AppFonts.font(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark ? Pallete.accent : const Color(0xFFEAA610),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                             const Spacer(),
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      l.tr('have_account'),
-                                      style: AppFonts.font(
-                                        fontSize: 14,
-                                        color: subColor,
-                                      ),
+                            // Bottom switcher banner matching mockup
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 16, top: 24),
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: isDark ? Pallete.darkSurfaceVariant : const Color(0xFFEBEFEB),
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: isDark ? const Color(0xFF2C322E) : const Color(0xFFC7D3C5),
+                                      shape: BoxShape.circle,
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          LoginScreen.routeName,
-                                        );
-                                      },
-                                      child: Text(
-                                        l.tr('login'),
-                                        style: AppFonts.font(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: Pallete.accent,
+                                    child: const Icon(
+                                      Icons.login_rounded,
+                                      color: Pallete.primary,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          l.tr('have_account'),
+                                          style: AppFonts.font(
+                                            fontSize: 14,
+                                            color: isDark ? Pallete.darkTextPrimary : Pallete.textSecondary,
+                                          ),
                                         ),
-                                      ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              LoginScreen.routeName,
+                                            );
+                                          },
+                                          child: Text(
+                                            l.tr('login'),
+                                            style: AppFonts.font(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w800,
+                                              color: Pallete.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
