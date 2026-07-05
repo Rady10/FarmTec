@@ -108,6 +108,54 @@ String formatModelResult({
         }
       }
       return l.convertNumbers('${l.tr('model_result_soil_health_report')} $data');
+    case 'Fertilizer Planner':
+      if (data is Map<String, dynamic>) {
+        Map<String, dynamic>? payload;
+        if (data['data'] is List) {
+          payload = (data['data'] as List).whereType<Map<String, dynamic>>().firstWhere(
+            (item) => item.containsKey('Selected Fertilizer') || item.containsKey('recommended_fertilizer_amount'),
+            orElse: () => <String, dynamic>{},
+          );
+          if (payload.isEmpty) payload = null;
+        } else if (data['data'] is Map<String, dynamic>) {
+          payload = data['data'] as Map<String, dynamic>;
+        }
+
+        final record = payload ?? data;
+        final fertilizerName = record['Selected Fertilizer']?.toString() ??
+            record['fertilizer_type']?.toString() ??
+            record['fertilizer_name']?.toString() ??
+            record['fertilizer']?.toString() ??
+            l.tr('model_result_unknown');
+
+        final amount = record['recommended_fertilizer_amount'] ??
+            record['amount_kg_ha'] ??
+            record['amount'] ??
+            record['dose_kg_ha'] ??
+            (record['current_application'] is Map<String, dynamic>
+                ? record['current_application']['amount_kg_ha']
+                : null);
+
+        final recommendation = record['schedule_summary']?.toString() ??
+            record['agronomic_explanation']?.toString() ??
+            record['recommendation']?.toString() ??
+            record['notes']?.toString() ??
+            l.tr('model_result_unknown');
+
+        final amountText = amount is num
+            ? (amount % 1 == 0 ? amount.toStringAsFixed(0) : amount.toStringAsFixed(1))
+            : amount?.toString() ?? l.tr('model_result_unknown');
+
+        return l.convertNumbers(
+          [
+            l.tr('model_result_fertilizer_title'),
+            l.trParams('model_result_fertilizer_name', {'name': fertilizerName}),
+            l.trParams('model_result_fertilizer_amount', {'amount': amountText}),
+            l.trParams('model_result_fertilizer_recommendation', {'recommendation': recommendation}),
+          ].join('\n'),
+        );
+      }
+      return l.convertNumbers('${l.tr('model_result_fertilizer_title')} $data');
     default:
       return data.toString();
   }

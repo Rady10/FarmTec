@@ -63,4 +63,28 @@ void main() {
 
     expect(result, contains('Plant Analysis'));
   });
+
+  test('model formatter parses fertilizer planner nested API response', () {
+    final l = AppLocalizations(const Locale('en'));
+    final result = formatModelResult(
+      modelName: 'Fertilizer Planner',
+      data: {
+        'data': [
+          '### Recommendation',
+          {
+            'status': 'success',
+            'Selected Fertilizer': 'Urea (46% N)',
+            'recommended_fertilizer_amount': 3.2,
+            'schedule_summary': 'Apply at tillering stage',
+          }
+        ]
+      },
+      l: l,
+    );
+
+    expect(result, contains('Fertilizer'));
+    expect(result, contains('Urea (46% N)'));
+    expect(result, contains('3.2'));
+    expect(result, contains('Apply at tillering stage'));
+  });
 }
