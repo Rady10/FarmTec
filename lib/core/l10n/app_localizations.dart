@@ -147,6 +147,12 @@ class AppLocalizations {
           'Calculates irrigation needs from GPS coordinates',
       'market_forecast': 'Market Forecast',
       'market_forecast_desc': 'Commodity price forecast from live market data',
+      'fertilizer_planner': 'Fertilizer Planner',
+      'fertilizer_planner_desc':
+          'Recommends fertilizer schedules and amounts based on crop and soil health',
+      'soil_health': 'Soil Health',
+      'soil_health_desc':
+          'Assess soil quality from field coordinates and receive health scoring guidance.',
       'current_values': 'Current Values',
       'run_model': 'Run Model',
       'run_prediction': 'Run Prediction',
@@ -253,6 +259,8 @@ class AppLocalizations {
       'op_ai_irrigation_planner': 'Irrigation Planner',
       'op_ai_market_forecast': 'Market Forecast',
       'op_ai_disease_detection': 'Disease Detection',
+      'op_ai_fertilizer_planner': 'Fertilizer Planner',
+      'op_ai_soil_health': 'Soil Health',
       'no_activity_yet': 'No activity yet',
       'activity_on_farm': 'Farm: {farm}',
       'ndvi_scan': 'NDVI Scan',
@@ -453,6 +461,23 @@ class AppLocalizations {
       'recommended_crop': '🌾 Recommended: {crop}',
       'yield_predicted': '📊 Yield: {yield} {unit}',
       'irrigation_need': '💧 Need: {need}mm ({class})',
+      'model_result_disease_detection': '🧪 Plant Analysis: {response}',
+      'model_result_yield_prediction': '📊 Yield Prediction',
+      'model_result_irrigation_estimate': '💧 Irrigation Estimate',
+      'model_result_irrigation_need': '• Need: {need} mm/season',
+      'model_result_irrigation_class': '• Class: {class}',
+      'model_result_confidence': '• Confidence: {confidence}',
+      'model_result_reliability': '• Reliability: {reliability}',
+      'model_result_season': '• Season: {season}',
+      'model_result_soil_health_report': '🧪 Soil Health Report',
+      'model_result_soil_health_score': '• Overall score: {score}/100',
+      'model_result_soil_health_rating': '• Rating: {rating}',
+      'model_result_soil_health_limiting': '• Limiting factor: {factor}',
+      'model_result_soil_health_recommendation': '• Recommendation: {recommendation}',
+      'model_result_soil_health_distance': '• Nearest data: {distance} km',
+      'model_result_market_forecast': '📈 Forecast:',
+      'model_result_market_item': '  • {commodity}: {price}',
+      'model_result_unknown': 'N/A',
 
       // ── Extra Chat ──
       'chat_welcome':
@@ -559,6 +584,8 @@ class AppLocalizations {
       // ── Extra Notifications ──
       'market_update': 'Market Update',
       'just_now': 'Just now',
+      'days_ago': '{days} days ago',
+      'hours_ago': '{hours} hours ago',
       'notif_market_changed':
           'Wheat price changed to {price}/t. Review your selling strategy.',
       'notif_market_up':
@@ -685,6 +712,12 @@ class AppLocalizations {
           'يحسب كمية المياه المطلوبة بناءً على حالة التربة.',
       'market_forecast': 'توقعات الأسعار',
       'market_forecast_desc': 'يعرض توقعات أسعار المحاصيل في السوق.',
+      'fertilizer_planner': 'مخطط التسميد',
+      'fertilizer_planner_desc':
+          'يقترح جداول التسميد وكمياتها بناءً على صحة المحصول والتربة.',
+      'soil_health': 'صحة التربة',
+      'soil_health_desc':
+          'قيّم جودة التربة من إحداثيات الحقل واحصل على دليل تقييم الصحة.',
       'current_values': 'القيم الحالية',
       'run_model': 'تشغيل التحليل',
       'run_prediction': 'ابدأ التحليل',
@@ -791,6 +824,8 @@ class AppLocalizations {
       'op_ai_irrigation_planner': 'تخطيط الري',
       'op_ai_market_forecast': 'توقعات السوق',
       'op_ai_disease_detection': 'كشف الأمراض',
+      'op_ai_fertilizer_planner': 'مخطط التسميد',
+      'op_ai_soil_health': 'صحة التربة',
       'no_activity_yet': 'لا يوجد نشاط بعد',
       'activity_on_farm': 'المزرعة: {farm}',
       'ndvi_scan': 'فحص NDVI',
@@ -990,6 +1025,23 @@ class AppLocalizations {
       'recommended_crop': '🌾 المحصول المقترح: {crop}',
       'yield_predicted': '📊 المحصول المتوقع: {yield} {unit}',
       'irrigation_need': '💧 الاحتياج: {need} ملم ({class})',
+      'model_result_irrigation_estimate': '💧 تقدير الري',
+      'model_result_irrigation_need': '• الاحتياج: {need} ملم/الموسم',
+      'model_result_irrigation_class': '• الفئة: {class}',
+      'model_result_confidence': '• الثقة: {confidence}',
+      'model_result_reliability': '• الموثوقية: {reliability}',
+      'model_result_season': '• الموسم: {season}',
+      'model_result_soil_health_report': '🧪 تقرير صحة التربة',
+      'model_result_soil_health_score': '• الدرجة العامة: {score}/100',
+      'model_result_soil_health_rating': '• التصنيف: {rating}',
+      'model_result_soil_health_limiting': '• العامل المحدد: {factor}',
+      'model_result_soil_health_recommendation': '• التوصية: {recommendation}',
+      'model_result_soil_health_distance': '• أقرب بيانات: {distance} كم',
+      'model_result_market_forecast': '📈 التوقعات:',
+      'model_result_disease_detection': '🧪 تحليل النبات: {response}',
+      'model_result_yield_prediction': '📊 توقع المحصول',
+      'model_result_market_item': '  • {commodity}: {price}',
+      'model_result_unknown': 'غير متاح',
 
       // ── Extra Chat ──
       'chat_welcome':
@@ -1095,6 +1147,8 @@ class AppLocalizations {
       // ── Extra Notifications ──
       'market_update': 'تحديث الأسعار',
       'just_now': 'الآن',
+      'days_ago': 'قبل {days} يوم',
+      'hours_ago': 'قبل {hours} ساعة',
       'notif_market_changed':
           'تغير سعر القمح إلى {price}/طن. يرجى مراجعة استراتيجية البيع.',
       'notif_market_up':

@@ -128,6 +128,84 @@ class AIModelsView extends StatelessWidget {
         ),
       ],
     ),
+    AIModelDefinition(
+      name: 'Soil Health',
+      desc: 'Assess soil quality from field coordinates and receive health scoring guidance.',
+      icon: Icons.terrain_rounded,
+      backgroundImage: 'assets/images/soil_illus.png',
+      apiUrl: 'https://youssef-d1aa-soil-health.hf.space/api/soil-health/',
+      fields: [
+        AIModelFieldDefinition(
+          key: 'lat',
+          label: 'Latitude',
+          hint: '30.0444',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'lon',
+          label: 'Longitude',
+          hint: '31.2357',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+      ],
+    ),
+    AIModelDefinition(
+      name: 'Fertilizer Planner',
+      desc: 'Recommends fertilizer schedules and amounts based on crop and soil health',
+      icon: Icons.grain_rounded,
+      backgroundImage: 'assets/images/fert_illus.png',
+      apiUrl: 'https://b1r-14n15-fertilizing.hf.space/api/predict',
+      fields: [
+        AIModelFieldDefinition(
+          key: 'crop',
+          label: 'Crop',
+          hint: 'wheat',
+          type: TextInputType.text,
+        ),
+        AIModelFieldDefinition(
+          key: 'predicted_yield',
+          label: 'Predicted Yield (t/ha)',
+          hint: '4.5',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'soil_nitrogen',
+          label: 'Soil Nitrogen (%)',
+          hint: '0.1',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'soil_soc',
+          label: 'Soil Organic Carbon (%)',
+          hint: '1.5',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'soil_ph',
+          label: 'Soil pH',
+          hint: '7.2',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'fertilizer_type',
+          label: 'Fertilizer Type',
+          hint: 'Urea (46% N)',
+          type: TextInputType.text,
+        ),
+        AIModelFieldDefinition(
+          key: 'plant_date',
+          label: 'Planting Date (YYYY-MM-DD)',
+          hint: '2025-11-01',
+          type: TextInputType.text,
+        ),
+        AIModelFieldDefinition(
+          key: 'current_date',
+          label: 'Current Date (YYYY-MM-DD)',
+          hint: '2025-12-10',
+          type: TextInputType.text,
+        ),
+      ],
+    ),
   ];
 
   @override

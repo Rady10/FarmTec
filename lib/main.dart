@@ -7,6 +7,7 @@ import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/core/services/notification_settings_service.dart';
+import 'package:farmtec/core/services/soil_health_service.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
 import 'package:farmtec/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => YieldPredictionService()),
         ChangeNotifierProvider(create: (_) => NotificationSettingsService()),
+        ChangeNotifierProvider(create: (_) => SoilHealthService()),
         ChangeNotifierProvider(create: (_) => AppNotificationService()),
       ],
       child: const FarmTecApp(),

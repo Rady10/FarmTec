@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:farmtec/core/themes/app_fonts.dart';
 
 import 'package:farmtec/core/l10n/app_localizations.dart';
+import 'package:farmtec/core/services/soil_health_service.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/add_task_sheet.dart';
@@ -59,6 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   String? _loadedFarmId;
   List<Map<String, dynamic>> _tasks = [];
+  double _soilScore = 0;
 
   @override
   void didChangeDependencies() {
@@ -201,6 +203,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final farmService = Provider.of<FarmProvider>(context);
     final farm = farmService.selectedFarm;
     final crop = farm?.crop ?? 'Wheat';
+    final soilHealthService = Provider.of<SoilHealthService>(context);
+    if (farm != null && mounted) {
+      Future.microtask(() async {
+        final score = await soilHealthService.getScoreForLocation(
+          lat: farm.lat,
+          lng: farm.lng,
+        );
+        if (mounted && (_soilScore - score).abs() > 0.0001) {
+          setState(() => _soilScore = score);
+        }
+      });
+    }
     _ensurePricesLoaded(crop);
     final textColor = colors.textPrimary;
     final subColor = colors.textSecondary;
@@ -408,8 +422,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   metrics: _soilMetrics,
                   isDark: isDark,
                   textColor: textColor,
-                  overallHealth: 0.74,
-                  overallValue: '74%',
+                  overallHealth: (_soilScore / 100).clamp(0.0, 1.0),
+                  overallValue: '${l.convertNumbers(_soilScore.toStringAsFixed(0))}%',
                   overallLabelKey: 'overall_soil_health',
                 ),
               ),
@@ -579,6 +593,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showAddTaskSheet() {
     final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
+    final soilHealthService = Provider.of<SoilHealthService>(context, listen: false);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

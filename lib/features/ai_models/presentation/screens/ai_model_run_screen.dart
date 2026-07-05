@@ -19,6 +19,100 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+String formatModelResult({
+  required String modelName,
+  required dynamic data,
+  required AppLocalizations l,
+  String Function(num, AppLocalizations)? formatEgp,
+}) {
+  switch (modelName) {
+    case 'Disease Detection':
+      final response = data is String ? data : data.toString();
+      return l.convertNumbers(
+        l.trParams('model_result_disease_detection', {'response': response}),
+      );
+    case 'Crop Recommendation':
+      final c = (data['predicted_crop'] ?? data['prediction'] ?? 'Unknown').toString();
+      final crop = c.isNotEmpty ? c[0].toUpperCase() + c.substring(1) : c;
+      return l.convertNumbers(
+        l.trParams('recommended_crop', {'crop': crop}),
+      );
+    case 'Yield Prediction':
+      final y = data['predicted_yield'] ?? data['yield'] ?? data['prediction'];
+      if (y == null) {
+        return l.convertNumbers('${l.tr('model_result_yield_prediction')} $data');
+      }
+      final yieldStr = y is num ? y.toStringAsFixed(2) : y.toString();
+      return l.convertNumbers(
+        l.trParams('yield_predicted', {
+          'yield': yieldStr,
+          'unit': (data['unit'] ?? 't/ha').toString(),
+        }),
+      );
+    case 'Irrigation Planner':
+      final need = data['irrigation_need_mm_season'] ??
+          data['irrigation_need_mm'] ??
+          l.tr('model_result_unknown');
+      final irrigationClass = data['irrigation_class'] ?? l.tr('model_result_unknown');
+      final confidence = data['confidence']?.toString() ?? l.tr('model_result_unknown');
+      final reliability = data['reliability_flag']?.toString() ?? l.tr('model_result_unknown');
+      final season = data['season']?.toString() ?? l.tr('model_result_unknown');
+      return l.convertNumbers(
+        [
+          l.tr('model_result_irrigation_estimate'),
+          l.trParams('model_result_irrigation_need', {'need': '$need'}),
+          l.trParams('model_result_irrigation_class', {'class': '$irrigationClass'}),
+          l.trParams('model_result_confidence', {'confidence': '$confidence'}),
+          l.trParams('model_result_reliability', {'reliability': '$reliability'}),
+          l.trParams('model_result_season', {'season': '$season'}),
+        ].join('\n'),
+      );
+    case 'Market Forecast':
+      if (data is List && data.isNotEmpty) {
+        final forecastTitle = l.tr('model_result_market_forecast');
+        final lines = data.take(5).map((e) {
+          final rawPrice = e['price'];
+          final num priceNum = rawPrice is num
+              ? rawPrice
+              : num.tryParse(rawPrice?.toString() ?? '0') ?? 0;
+          return l.trParams('model_result_market_item', {
+            'commodity': '${e['commodity'] ?? l.tr('model_result_unknown')}',
+            'price': formatEgp?.call(priceNum, l) ??
+                l.convertNumbers(priceNum.toStringAsFixed(2)),
+          });
+        }).join('\n');
+        return l.convertNumbers('$forecastTitle\n$lines');
+      }
+      return l.convertNumbers('${l.tr('model_result_market_forecast')} $data');
+    case 'Soil Health':
+      if (data is Map<String, dynamic>) {
+        final soilData = data['data'];
+        if (soilData is Map<String, dynamic>) {
+          final score = soilData['overall_score'];
+          final rating = soilData['rating']?.toString() ?? l.tr('model_result_unknown');
+          final limitingFactor = soilData['limiting_factor']?.toString() ?? l.tr('model_result_unknown');
+          final recommendation = soilData['recommendation']?.toString() ?? l.tr('model_result_unknown');
+          final distance = soilData['distance_to_nearest_data_km'];
+          final scoreText = score is num ? score.toStringAsFixed(1) : score?.toString() ?? l.tr('model_result_unknown');
+          final distanceText = distance is num ? distance.toStringAsFixed(1) : distance?.toString() ?? l.tr('model_result_unknown');
+          return l.convertNumbers(
+            [
+              l.tr('model_result_soil_health_report'),
+              l.trParams('model_result_soil_health_score', {'score': '$scoreText'}),
+              l.trParams('model_result_soil_health_rating', {'rating': '$rating'}),
+              l.trParams('model_result_soil_health_limiting', {'factor': '$limitingFactor'}),
+              l.trParams('model_result_soil_health_recommendation', {'recommendation': '$recommendation'}),
+              l.trParams('model_result_soil_health_distance', {'distance': '$distanceText'}),
+            ].join('\n'),
+          );
+        }
+      }
+      return l.convertNumbers('${l.tr('model_result_soil_health_report')} $data');
+    default:
+      return data.toString();
+  }
+}
+
 class AiModelRunScreen extends StatefulWidget {
   final AIModelDefinition model;
 
@@ -37,13 +131,35 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   String? _result;
   bool _isError = false;
 
-  static const _statValues = {
-    'Disease Detection': {'last_scan': 'Today'},
-    'Crop Recommendation': {'last_scan': 'Today'},
-    'Yield Prediction': {'last_scan': 'Today'},
-    'Irrigation Planner': {'last_scan': 'Today'},
-    'Market Forecast': {'last_scan': 'Today'},
-  };
+  String _lastScanLabel(AppLocalizations l) {
+    final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
+    if (farm == null) {
+      return l.tr('last_scan');
+    }
+
+    final historyService = Provider.of<FarmHistoryService>(context, listen: false);
+    final recentEntries = historyService.getForFarm(farm.id);
+    final matching = recentEntries.where((op) {
+      return op.title == widget.model.name || op.titleKey == _titleKeyForModel(widget.model.name);
+    }).toList();
+
+    if (matching.isEmpty) {
+      return l.tr('no_scans_yet');
+    }
+
+    final latest = matching.first.timestamp;
+    final now = DateTime.now();
+    final diffInDays = now.difference(latest).inDays;
+    final diffInHours = now.difference(latest).inHours;
+
+    if (diffInDays >= 1) {
+      return l.trParams('days_ago', {'days': l.convertNumbers(diffInDays.toString())});
+    }
+    if (diffInHours >= 1) {
+      return l.trParams('hours_ago', {'hours': l.convertNumbers(diffInHours.toString())});
+    }
+    return l.tr('just_now');
+  }
 
   @override
   void initState() {
@@ -65,6 +181,64 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         }
         if (_controllers.containsKey('year')) {
           _controllers['year']!.text = DateTime.now().year.toString();
+        }
+        if (_controllers.containsKey('predicted_yield')) {
+          _controllers['predicted_yield']!.text = '4.5';
+        }
+        if (_controllers.containsKey('soil_nitrogen')) {
+          _controllers['soil_nitrogen']!.text = '0.1';
+        }
+        if (_controllers.containsKey('soil_soc')) {
+          _controllers['soil_soc']!.text = '1.5';
+        }
+        if (_controllers.containsKey('soil_ph')) {
+          _controllers['soil_ph']!.text = '7.2';
+        }
+        if (_controllers.containsKey('fertilizer_type')) {
+          _controllers['fertilizer_type']!.text = 'Urea (46% N)';
+        }
+        if (_controllers.containsKey('plant_date')) {
+          if (farm.plantedAt != null) {
+            final y = farm.plantedAt!.year.toString().padLeft(4, '0');
+            final m = farm.plantedAt!.month.toString().padLeft(2, '0');
+            final d = farm.plantedAt!.day.toString().padLeft(2, '0');
+            _controllers['plant_date']!.text = '$y-$m-$d';
+          } else {
+            _controllers['plant_date']!.text = '2025-11-01';
+          }
+        }
+        if (_controllers.containsKey('current_date')) {
+          final now = DateTime.now();
+          final y = now.year.toString().padLeft(4, '0');
+          final m = now.month.toString().padLeft(2, '0');
+          final d = now.day.toString().padLeft(2, '0');
+          _controllers['current_date']!.text = '$y-$m-$d';
+        }
+      } else {
+        if (_controllers.containsKey('predicted_yield')) {
+          _controllers['predicted_yield']!.text = '4.5';
+        }
+        if (_controllers.containsKey('soil_nitrogen')) {
+          _controllers['soil_nitrogen']!.text = '0.1';
+        }
+        if (_controllers.containsKey('soil_soc')) {
+          _controllers['soil_soc']!.text = '1.5';
+        }
+        if (_controllers.containsKey('soil_ph')) {
+          _controllers['soil_ph']!.text = '7.2';
+        }
+        if (_controllers.containsKey('fertilizer_type')) {
+          _controllers['fertilizer_type']!.text = 'Urea (46% N)';
+        }
+        if (_controllers.containsKey('plant_date')) {
+          _controllers['plant_date']!.text = '2025-11-01';
+        }
+        if (_controllers.containsKey('current_date')) {
+          final now = DateTime.now();
+          final y = now.year.toString().padLeft(4, '0');
+          final m = now.month.toString().padLeft(2, '0');
+          final d = now.day.toString().padLeft(2, '0');
+          _controllers['current_date']!.text = '$y-$m-$d';
         }
       }
     });
@@ -151,7 +325,12 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                   return MarketCropUtils.matchesCommodity(commodity, selectedCrop);
                 }).toList()
               : decoded;
-          _result = _fmt(filtered, l);
+          _result = formatModelResult(
+            modelName: widget.model.name,
+            data: filtered,
+            l: l,
+            formatEgp: (value, localization) => _formatEgp(value, localization),
+          );
           if (mounted) await _persistResult(filtered);
           return;
         }
@@ -173,6 +352,74 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
             : f.hint;
         body[f.key] = double.tryParse(val) ?? val;
       }
+      response = await http
+          .post(
+            Uri.parse(widget.model.apiUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+    } else if (widget.model.name == 'Fertilizer Planner') {
+      final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
+      final cropVal = _controllers['crop']!.text.isNotEmpty
+          ? _controllers['crop']!.text.toLowerCase()
+          : (farm?.crop.toLowerCase() ?? 'wheat');
+      final predictedYield = double.tryParse(_controllers['predicted_yield']!.text) ?? 4.5;
+      final soilNitrogen = double.tryParse(_controllers['soil_nitrogen']!.text) ?? 0.1;
+      final soilSoc = double.tryParse(_controllers['soil_soc']!.text) ?? 1.5;
+      final soilPh = double.tryParse(_controllers['soil_ph']!.text) ?? 7.2;
+      final fertilizerType = _controllers['fertilizer_type']!.text.isNotEmpty
+          ? _controllers['fertilizer_type']!.text
+          : 'Urea (46% N)';
+      final plantDate = _controllers['plant_date']!.text.isNotEmpty
+          ? _controllers['plant_date']!.text
+          : '2025-11-01';
+      final currentDate = _controllers['current_date']!.text.isNotEmpty
+          ? _controllers['current_date']!.text
+          : '2025-12-10';
+
+      final lat = farm?.lat != 0 ? farm!.lat : 30.0;
+      final lon = farm?.lng != 0 ? farm!.lng : 31.0;
+      final harvestedArea = double.tryParse(farm?.area ?? '5.0') ?? 5.0;
+
+      final dataList = [
+        "F-001", // field_id
+        lat,     // lat
+        lon,     // lon
+        cropVal, // crop
+        DateTime.now().year, // year
+        harvestedArea, // harvested area
+        predictedYield, // predicted_yield
+        soilNitrogen, // s_n
+        soilSoc,     // s_soc
+        soilPh,      // s_ph
+        18.0,        // s_cec
+        35.0,        // s_clay
+        0.25,        // s_moist
+        0.6,         // s_fi
+        0.5,         // wb
+        0.7,         // wa
+        0.2,         // hs
+        "Basic",     // sat_mode
+        0.3,         // season_ndre
+        0.5,         // season_ndvi
+        0.2,         // season_evi
+        // ndre m01-m12
+        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+        // ndvi m01-m12
+        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+        // evi m01-m12
+        0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+        fertilizerType,
+        plantDate,
+        currentDate,
+      ];
+
+      final body = {
+        "fn_index": 1,
+        "data": dataList,
+      };
+
       response = await http
           .post(
             Uri.parse(widget.model.apiUrl),
@@ -207,7 +454,12 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     if (!mounted) return;
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-      _result = _fmt(decoded, l);
+      _result = formatModelResult(
+        modelName: widget.model.name,
+        data: decoded,
+        l: l,
+        formatEgp: (value, localization) => _formatEgp(value, localization),
+      );
       if (mounted) await _persistResult(decoded);
     } else {
       _isError = true;
@@ -230,6 +482,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         return 'op_ai_irrigation_planner';
       case 'Market Forecast':
         return 'op_ai_market_forecast';
+      case 'Soil Health':
+        return 'op_ai_soil_health';
       default:
         return null;
     }
@@ -243,6 +497,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         return OperationType.irrigation;
       case 'Crop Recommendation':
         return OperationType.cropPlant;
+      case 'Soil Health':
+        return OperationType.aiModelRun;
       default:
         return OperationType.aiModelRun;
     }
@@ -289,53 +545,6 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     }
   }
 
-  String _fmt(dynamic d, AppLocalizations l) {
-    switch (widget.model.name) {
-      case 'Disease Detection':
-        return d is String ? d : d.toString();
-      case 'Crop Recommendation':
-        final c =
-            (d['predicted_crop'] ?? d['prediction'] ?? 'Unknown').toString();
-        final crop =
-            c.isNotEmpty ? c[0].toUpperCase() + c.substring(1) : c;
-        return l.convertNumbers(
-          l.trParams('recommended_crop', {'crop': crop}),
-        );
-      case 'Yield Prediction':
-        final y = d['predicted_yield'] ?? d['yield'] ?? d['prediction'];
-        if (y == null) return '📊 $d';
-        final yieldStr = y is num ? y.toStringAsFixed(2) : y.toString();
-        return l.convertNumbers(
-          l.trParams('yield_predicted', {
-            'yield': yieldStr,
-            'unit': (d['unit'] ?? 't/ha').toString(),
-          }),
-        );
-      case 'Irrigation Planner':
-        return l.convertNumbers(
-          l.trParams('irrigation_need', {
-            'need': '${d['irrigation_need_mm'] ?? 'N/A'}',
-            'class': '${d['irrigation_class'] ?? 'N/A'}',
-          }),
-        );
-      case 'Market Forecast':
-        if (d is List && d.isNotEmpty) {
-          return l.convertNumbers(
-            '📈 Forecast:\n${d.take(5).map((e) {
-              final rawPrice = e['price'];
-              final num priceNum = rawPrice is num
-                  ? rawPrice
-                  : num.tryParse(rawPrice?.toString() ?? '0') ?? 0;
-              return '  • ${e['commodity']}: ${_formatEgp(priceNum, l)}';
-            }).join('\n')}',
-          );
-        }
-        return '📈 $d';
-      default:
-        return d.toString();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -349,10 +558,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     final descKey =
         '${widget.model.name.toLowerCase().replaceAll(' ', '_')}_desc';
     final desc = l.tr(descKey);
-    final statValues = _statValues[widget.model.name] ??
-        {'last_scan': l.tr('last_scan')};
     final stats = {
-      l.tr('last_scan'): l.convertNumbers(statValues['last_scan']!),
+      l.tr('last_scan'): _lastScanLabel(l),
     };
     const accentGreen = Pallete.aiModelGreen;
 
