@@ -9,6 +9,7 @@ class ProfileSheetField extends StatelessWidget {
   final IconData icon;
   final bool obscure;
   final bool isDark;
+  final TextEditingController? controller;
 
   const ProfileSheetField(
     this.label,
@@ -17,11 +18,13 @@ class ProfileSheetField extends StatelessWidget {
     super.key,
     this.obscure = false,
     required this.isDark,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       style: AppFonts.font(
         fontSize: 14,

@@ -5,9 +5,11 @@ import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/splash/presentation/widgets/splash_particles.dart';
 import 'package:farmtec/core/services/preferences_service.dart';
 import 'package:farmtec/features/auth/presentation/screens/login_screen.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
+import 'package:farmtec/features/farm_selection/presentation/screens/farm_selection_screen.dart';
 import 'package:farmtec/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class SplashBody extends StatefulWidget {
   const SplashBody({super.key});
@@ -80,12 +82,24 @@ class _SplashBodyState extends State<SplashBody> with TickerProviderStateMixin {
 
     _mainCtrl.forward().then((_) async {
       if (!mounted) return;
-      final seen = await PreferencesService.isOnboardingSeen();
+      final authProvider = context.read<AuthProvider>();
+      final isLoggedIn = await authProvider.tryAutoLogin();
+      
       if (!mounted) return;
-      Navigator.pushReplacementNamed(
-        context,
-        seen ? LoginScreen.routeName : OnboardingScreen.routeName,
-      );
+      
+      if (isLoggedIn) {
+        Navigator.pushReplacementNamed(
+          context,
+          FarmSelectionScreen.routeName,
+        );
+      } else {
+        final seen = await PreferencesService.isOnboardingSeen();
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(
+          context,
+          seen ? LoginScreen.routeName : OnboardingScreen.routeName,
+        );
+      }
     });
   }
 

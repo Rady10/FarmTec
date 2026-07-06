@@ -1,7 +1,6 @@
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/services/soil_health_service.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
-import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/features/my_farm/presentation/widgets/my_farm_card_style.dart';
 import 'package:flutter/material.dart';
@@ -43,41 +42,58 @@ class FarmSoilMetricsCard extends StatelessWidget {
     final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
     final soilHealthService = Provider.of<SoilHealthService>(context, listen: false);
     final scoreFuture = farm != null
-        ? soilHealthService.getScoreForLocation(lat: farm.lat, lng: farm.lng)
-        : Future.value(0.0);
-    final details = [
-      _SoilDetail(
-        icon: Icons.thermostat_rounded,
-        labelKey: 'ph_level',
-        value: '6.8',
-        statusKey: 'optimal',
-        color: Color(0xFF7CB342),
-      ),
-      _SoilDetail(
-        icon: Icons.grass_rounded,
-        labelKey: 'organic_matter',
-        value: '2.9%',
-        color: Color(0xFF4CAF50),
-      ),
-      _SoilDetail(
-        icon: Icons.eco_rounded,
-        labelKey: 'nitrogen',
-        value: l.tr('medium'),
-        color: Color(0xFF26A69A),
-      ),
-      _SoilDetail(
-        icon: Icons.layers_rounded,
-        labelKey: 'texture',
-        value: 'Loam',
-        color: Color(0xFF42A5F5),
-      ),
-    ];
+        ? soilHealthService.getSoilHealthForLocation(lat: farm.lat, lng: farm.lng)
+        : Future.value(null);
 
-    return FutureBuilder<double>(
+    return FutureBuilder<Map<String, dynamic>?>(
       future: scoreFuture,
       builder: (context, snapshot) {
-        final score = snapshot.data ?? 0.0;
+        final data = snapshot.data;
+        final score = data != null ? (data['overall_score'] as num?)?.toDouble() ?? 0.0 : 0.0;
         final progress = (score / 100).clamp(0.0, 1.0);
+
+        final components = data != null ? data['components'] as Map<String, dynamic>? : null;
+        
+        final phScore = components != null ? (components['ph'] as num?)?.toDouble() ?? 0.0 : 0.0;
+        final phVal = phScore > 0 ? (5.5 + (phScore / 100) * 3.0).toStringAsFixed(1) : '6.8';
+        final phStatus = phScore > 80 ? 'optimal' : phScore > 50 ? 'good' : 'poor';
+
+        final ocScore = components != null ? (components['organic_carbon'] as num?)?.toDouble() ?? 0.0 : 0.0;
+        final ocVal = ocScore > 0 ? '${(1.0 + (ocScore / 100) * 3.0).toStringAsFixed(1)}%' : '2.9%';
+
+        final nScore = components != null ? (components['nitrogen'] as num?)?.toDouble() ?? 0.0 : 0.0;
+        final nVal = nScore > 80 ? l.tr('high') : nScore > 50 ? l.tr('medium') : l.tr('low');
+
+        final cecScore = components != null ? (components['cec'] as num?)?.toDouble() ?? 0.0 : 0.0;
+        final cecVal = cecScore > 0 ? '${(10.0 + (cecScore / 100) * 20.0).toStringAsFixed(1)} meq' : '24.2 meq';
+
+        final details = [
+          _SoilDetail(
+            icon: Icons.thermostat_rounded,
+            labelKey: 'ph_level',
+            value: phVal,
+            statusKey: phStatus,
+            color: const Color(0xFF7CB342),
+          ),
+          _SoilDetail(
+            icon: Icons.grass_rounded,
+            labelKey: 'organic_matter',
+            value: ocVal,
+            color: const Color(0xFF4CAF50),
+          ),
+          _SoilDetail(
+            icon: Icons.eco_rounded,
+            labelKey: 'nitrogen',
+            value: nVal,
+            color: const Color(0xFF26A69A),
+          ),
+          _SoilDetail(
+            icon: Icons.layers_rounded,
+            labelKey: 'texture',
+            value: cecVal,
+            color: const Color(0xFF42A5F5),
+          ),
+        ];
         final scoreText = '${l.convertNumbers(score.toStringAsFixed(0))}%';
 
         return Container(

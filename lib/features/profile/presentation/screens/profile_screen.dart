@@ -3,6 +3,7 @@ import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/providers/locale_provider.dart';
 import 'package:farmtec/core/providers/theme_provider.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
 import 'package:farmtec/core/services/notification_settings_service.dart';
 import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
@@ -26,6 +27,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        Provider.of<AuthProvider>(context, listen: false).loadProfile();
+      }
+    });
+  }
+
   Widget _headerIconButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -185,13 +196,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      l.tr('profile_user_name'),
-                      style: AppFonts.font(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? colors.iconAccent : colors.textPrimary,
-                      ),
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, _) {
+                        final raw = authProvider.user?.username;
+                        final displayName = (raw != null && raw.isNotEmpty)
+                            ? raw
+                                .replaceAll('_', ' ')
+                                .split(' ')
+                                .map((w) => w.isNotEmpty
+                                    ? '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}'
+                                    : '')
+                                .join(' ')
+                            : l.tr('profile_user_name');
+                        return Text(
+                          displayName,
+                          style: AppFonts.font(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? colors.iconAccent : colors.textPrimary,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 24),
                   ],

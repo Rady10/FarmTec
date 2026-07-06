@@ -13,7 +13,6 @@ import 'package:farmtec/features/farm_selection/presentation/widgets/farm_sheet_
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +33,7 @@ class _EditFarmSheetState extends State<EditFarmSheet> {
   final _mapCtrl = MapController();
   bool _loadingGps = false;
   late DateTime _plantedAt;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -314,45 +314,73 @@ class _EditFarmSheetState extends State<EditFarmSheet> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () {
-                  if (_nameCtrl.text.isNotEmpty) {
-                    final areaHa =
-                        _areaCtrl.text.isNotEmpty ? _areaCtrl.text : '0';
-                    final updatedFarm = Farm(
-                      id: widget.farm.id,
-                      name: _nameCtrl.text,
-                      crop: _selectedCrop,
-                      area: '$areaHa ha',
-                      health: widget.farm.health,
-                      lastScan: widget.farm.lastScan,
-                      lat: double.tryParse(_latCtrl.text) ?? 0,
-                      lng: double.tryParse(_lngCtrl.text) ?? 0,
-                      plantedAt: _plantedAt,
-                    );
-                    
-                    Provider.of<FarmProvider>(context, listen: false).updateFarm(updatedFarm);
-                    
-                    Provider.of<FarmHistoryService>(
-                      context,
-                      listen: false,
-                    ).addOperation(
-                      FarmOperation(
-                        id: 'op_${DateTime.now().microsecondsSinceEpoch}',
-                        farmId: widget.farm.id,
-                        type: OperationType.cropPlant,
-                        title: 'Farm Updated',
-                        titleKey: 'farm_updated',
-                        description: '$_selectedCrop · $areaHa ha',
-                        timestamp: DateTime.now(),
+                onPressed: _isSaving
+                    ? null
+                    : () async {
+                        if (_nameCtrl.text.isNotEmpty) {
+                          setState(() => _isSaving = true);
+                          try {
+                            final areaHa = _areaCtrl.text.isNotEmpty ? _areaCtrl.text : '0';
+                            final updatedFarm = Farm(
+                              id: widget.farm.id,
+                              name: _nameCtrl.text,
+                              crop: _selectedCrop,
+                              area: '$areaHa ha',
+                              health: widget.farm.health,
+                              lastScan: widget.farm.lastScan,
+                              lat: double.tryParse(_latCtrl.text) ?? 0.0,
+                              lng: double.tryParse(_lngCtrl.text) ?? 0.0,
+                              plantedAt: _plantedAt,
+                            );
+
+                            await Provider.of<FarmProvider>(context, listen: false).updateFarm(updatedFarm);
+
+                            if (context.mounted) {
+                              Provider.of<FarmHistoryService>(
+                                context,
+                                listen: false,
+                              ).addOperation(
+                                FarmOperation(
+                                  id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+                                  farmId: widget.farm.id,
+                                  type: OperationType.cropPlant,
+                                  title: 'Farm Updated',
+                                  titleKey: 'farm_updated',
+                                  description: '$_selectedCrop · $areaHa ha',
+                                  timestamp: DateTime.now(),
+                                ),
+                              );
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error updating farm: $e'),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isSaving = false);
+                            }
+                          }
+                        }
+                      },
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l.tr('save') == 'save' ? 'Save Changes' : l.tr('save'),
+                        style: AppFonts.font(fontWeight: FontWeight.w700),
                       ),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(
-                  l.tr('save') == 'save' ? 'Save Changes' : l.tr('save'),
-                  style: AppFonts.font(fontWeight: FontWeight.w700),
-                ),
               ),
             ),
           ],

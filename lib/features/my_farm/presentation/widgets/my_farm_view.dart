@@ -415,55 +415,100 @@ class MyFarmView extends StatelessWidget {
     bool isDark,
   ) {
     final colors = context.appColors;
+    bool isDeleting = false;
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder:
-          (ctx) => AlertDialog(
-            backgroundColor: colors.card,
-            title: Text(
-              l.tr('delete_farm') == 'delete_farm'
-                  ? 'Delete Farm'
-                  : l.tr('delete_farm'),
-              style: AppFonts.font(
-                fontWeight: FontWeight.w800,
-                color: colors.textPrimary,
-              ),
-            ),
-            content: Text(
-              '${l.tr('confirm_delete') == 'confirm_delete' ? 'Are you sure you want to delete' : l.tr('confirm_delete')} ${farm.name}?',
-              style: AppFonts.font(
-                color: colors.textSecondary,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(
-                  l.tr('cancel') == 'cancel' ? 'Cancel' : l.tr('cancel'),
+          (ctx) => StatefulBuilder(
+            builder: (dialogCtx, setState) {
+              return AlertDialog(
+                backgroundColor: colors.card,
+                title: Text(
+                  l.tr('delete_farm') == 'delete_farm'
+                      ? 'Delete Farm'
+                      : l.tr('delete_farm'),
                   style: AppFonts.font(
-                    fontWeight: FontWeight.w700,
-                    color: colors.textSecondary,
+                    fontWeight: FontWeight.w800,
+                    color: colors.textPrimary,
                   ),
                 ),
-              ),
-              TextButton(
-                onPressed: () {
-                  farmService.removeFarm(farm.id);
-                  Navigator.pop(ctx);
-                  Navigator.pushReplacementNamed(
-                    context,
-                    FarmSelectionScreen.routeName,
-                  );
-                },
-                child: Text(
-                  l.tr('delete') == 'delete' ? 'Delete' : l.tr('delete'),
-                  style: AppFonts.font(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.redAccent,
-                  ),
-                ),
-              ),
-            ],
+                content: isDeleting
+                    ? Row(
+                        children: [
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Pallete.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              'Deleting farm...',
+                              style: AppFonts.font(color: colors.textSecondary),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        '${l.tr('confirm_delete') == 'confirm_delete' ? 'Are you sure you want to delete' : l.tr('confirm_delete')} ${farm.name}?',
+                        style: AppFonts.font(
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                actions: isDeleting
+                    ? const []
+                    : [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(
+                            l.tr('cancel') == 'cancel' ? 'Cancel' : l.tr('cancel'),
+                            style: AppFonts.font(
+                              fontWeight: FontWeight.w700,
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            setState(() => isDeleting = true);
+                            try {
+                              await farmService.removeFarm(farm.id);
+                              if (ctx.mounted) {
+                                Navigator.pop(ctx);
+                              }
+                              if (context.mounted) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  FarmSelectionScreen.routeName,
+                                );
+                              }
+                            } catch (e) {
+                              setState(() => isDeleting = false);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error deleting farm: $e'),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: Text(
+                            l.tr('delete') == 'delete' ? 'Delete' : l.tr('delete'),
+                            style: AppFonts.font(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ),
+                      ],
+              );
+            },
           ),
     );
   }

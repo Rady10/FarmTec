@@ -3,7 +3,10 @@ import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/auth/presentation/screens/login_screen.dart';
 import 'package:farmtec/features/auth/presentation/widgets/app_text_field.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
+import 'package:farmtec/features/farm_selection/presentation/screens/farm_selection_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignupBody extends StatefulWidget {
   const SignupBody({super.key});
@@ -19,6 +22,12 @@ class _SignupBodyState extends State<SignupBody>
   late AnimationController _fadeCtrl;
   late Animation<double> _fadeAnim;
 
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -32,11 +41,17 @@ class _SignupBodyState extends State<SignupBody>
   @override
   void dispose() {
     _fadeCtrl.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _locationController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l = AppLocalizations.of(context);
     final textColor = isDark ? Pallete.darkTextPrimary : Pallete.primary;
@@ -144,6 +159,7 @@ class _SignupBodyState extends State<SignupBody>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AppTextField(
+                                    controller: _nameController,
                                     label: l.tr('full_name'),
                                     hint: 'Ahmed Rady',
                                     type: TextInputType.name,
@@ -154,6 +170,7 @@ class _SignupBodyState extends State<SignupBody>
                                   ),
                                   const SizedBox(height: 16),
                                   AppTextField(
+                                    controller: _emailController,
                                     label: l.tr('email_address'),
                                     hint: 'farm@example.com',
                                     type: TextInputType.emailAddress,
@@ -164,6 +181,7 @@ class _SignupBodyState extends State<SignupBody>
                                   ),
                                   const SizedBox(height: 16),
                                   AppTextField(
+                                    controller: _phoneController,
                                     label: l.tr('phone_number'),
                                     hint: '+20 123 456 7890',
                                     type: TextInputType.phone,
@@ -174,6 +192,7 @@ class _SignupBodyState extends State<SignupBody>
                                   ),
                                   const SizedBox(height: 16),
                                   AppTextField(
+                                    controller: _locationController,
                                     label: l.tr('location_region'),
                                     hint: 'Cairo, Egypt',
                                     type: TextInputType.text,
@@ -188,6 +207,7 @@ class _SignupBodyState extends State<SignupBody>
                                   ),
                                   const SizedBox(height: 16),
                                   AppTextField(
+                                    controller: _passwordController,
                                     label: l.tr('password'),
                                     hint: '••••••••',
                                     type: TextInputType.visiblePassword,
@@ -226,29 +246,66 @@ class _SignupBodyState extends State<SignupBody>
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                onPressed: () {
-                                  if (_formKey.currentState?.validate() ?? false) {
-                                    // Submit Form
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.spa_rounded,
-                                      color: Colors.white.withOpacity(0.9),
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      l.tr('signup_button'),
-                                      style: AppFonts.font(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
+                                onPressed: authProvider.isLoading
+                                    ? null
+                                    : () async {
+                                        if (_formKey.currentState?.validate() ?? false) {
+                                          final fullName = _nameController.text.trim();
+                                          final username = fullName
+                                              .replaceAll(RegExp(r'\s+'), '_')
+                                              .toLowerCase();
+                                          try {
+                                            await authProvider.register(
+                                              email: _emailController.text.trim(),
+                                              username: username,
+                                              password: _passwordController.text,
+                                              phoneNumber: _phoneController.text.trim(),
+                                            );
+                                            if (!context.mounted) return;
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              FarmSelectionScreen.routeName,
+                                            );
+                                          } catch (e) {
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  e.toString().replaceAll('Exception: ', ''),
+                                                ),
+                                                backgroundColor: Colors.redAccent,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                child: authProvider.isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.spa_rounded,
+                                            color: Colors.white.withOpacity(0.9),
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            l.tr('signup_button'),
+                                            style: AppFonts.font(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                             const SizedBox(height: 16),

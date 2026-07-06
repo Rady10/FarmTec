@@ -4,8 +4,10 @@ import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/core/utils/assets.dart';
 import 'package:farmtec/features/auth/presentation/screens/signup_screen.dart';
 import 'package:farmtec/features/auth/presentation/widgets/app_text_field.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
 import 'package:farmtec/features/farm_selection/presentation/screens/farm_selection_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:svg_flutter/svg.dart';
 
 class LoginBody extends StatefulWidget {
@@ -22,6 +24,9 @@ class _LoginBodyState extends State<LoginBody>
   late AnimationController _fadeCtrl;
   late Animation<double> _fadeAnim;
 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -35,11 +40,14 @@ class _LoginBodyState extends State<LoginBody>
   @override
   void dispose() {
     _fadeCtrl.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l = AppLocalizations.of(context);
     final cardColor = isDark ? Pallete.darkCard : Colors.white;
@@ -150,6 +158,7 @@ class _LoginBodyState extends State<LoginBody>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AppTextField(
+                                    controller: _emailController,
                                     label: l.tr('email_address'),
                                     hint: 'farm@example.com',
                                     type: TextInputType.emailAddress,
@@ -160,6 +169,7 @@ class _LoginBodyState extends State<LoginBody>
                                   ),
                                   const SizedBox(height: 16),
                                   AppTextField(
+                                    controller: _passwordController,
                                     label: l.tr('password'),
                                     hint: '••••••••',
                                     type: TextInputType.visiblePassword,
@@ -213,33 +223,61 @@ class _LoginBodyState extends State<LoginBody>
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                onPressed: () {
-                                  if (_formKey.currentState?.validate() ?? false) {
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      FarmSelectionScreen.routeName,
-                                    );
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.spa_rounded,
-                                      color: Colors.white.withOpacity(0.9),
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      l.tr('login_button'),
-                                      style: AppFonts.font(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
+                                onPressed: authProvider.isLoading
+                                    ? null
+                                    : () async {
+                                        if (_formKey.currentState?.validate() ?? false) {
+                                          try {
+                                            await authProvider.login(
+                                              email: _emailController.text.trim(),
+                                              password: _passwordController.text,
+                                            );
+                                            if (!context.mounted) return;
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              FarmSelectionScreen.routeName,
+                                            );
+                                          } catch (e) {
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  e.toString().replaceAll('Exception: ', ''),
+                                                ),
+                                                backgroundColor: Colors.redAccent,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                child: authProvider.isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.spa_rounded,
+                                            color: Colors.white.withOpacity(0.9),
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            l.tr('login_button'),
+                                            style: AppFonts.font(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                             const SizedBox(height: 24),

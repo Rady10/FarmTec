@@ -31,6 +31,7 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
   final _mapCtrl = MapController();
   bool _loadingGps = false;
   DateTime _plantedAt = DateTime.now();
+  bool _isAdding = false;
 
   @override
   void dispose() {
@@ -298,46 +299,75 @@ class _AddFarmSheetState extends State<AddFarmSheet> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () {
-                  if (_nameCtrl.text.isNotEmpty) {
-                    final farmId =
-                        'farm_${DateTime.now().millisecondsSinceEpoch}';
-                    final areaHa =
-                        _areaCtrl.text.isNotEmpty ? _areaCtrl.text : '0';
-                    Provider.of<FarmProvider>(context, listen: false).addFarm(
-                      Farm(
-                        id: farmId,
-                        name: _nameCtrl.text,
-                        crop: _selectedCrop,
-                        area: '$areaHa ha',
-                        health: 'healthy',
-                        lastScan: '',
-                        lat: double.tryParse(_latCtrl.text) ?? 0,
-                        lng: double.tryParse(_lngCtrl.text) ?? 0,
-                        plantedAt: _plantedAt,
+                onPressed: _isAdding
+                    ? null
+                    : () async {
+                        if (_nameCtrl.text.isNotEmpty) {
+                          setState(() => _isAdding = true);
+                          try {
+                            final farmId = 'farm_${DateTime.now().millisecondsSinceEpoch}';
+                            final areaHa = _areaCtrl.text.isNotEmpty ? _areaCtrl.text : '0';
+                            
+                            await Provider.of<FarmProvider>(context, listen: false).addFarm(
+                              Farm(
+                                id: farmId,
+                                name: _nameCtrl.text,
+                                crop: _selectedCrop,
+                                area: '$areaHa ha',
+                                health: 'healthy',
+                                lastScan: '',
+                                lat: double.tryParse(_latCtrl.text) ?? 0.0,
+                                lng: double.tryParse(_lngCtrl.text) ?? 0.0,
+                                plantedAt: _plantedAt,
+                              ),
+                            );
+
+                            if (context.mounted) {
+                              Provider.of<FarmHistoryService>(
+                                context,
+                                listen: false,
+                              ).addOperation(
+                                FarmOperation(
+                                  id: 'op_${DateTime.now().microsecondsSinceEpoch}',
+                                  farmId: farmId,
+                                  type: OperationType.cropPlant,
+                                  title: 'Farm Created',
+                                  titleKey: 'farm_created',
+                                  description: '$_selectedCrop · $areaHa ha',
+                                  timestamp: DateTime.now(),
+                                ),
+                              );
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error creating farm: $e'),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isAdding = false);
+                            }
+                          }
+                        }
+                      },
+                child: _isAdding
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l.tr('add_farm'),
+                        style: AppFonts.font(fontWeight: FontWeight.w700),
                       ),
-                    );
-                    Provider.of<FarmHistoryService>(
-                      context,
-                      listen: false,
-                    ).addOperation(
-                      FarmOperation(
-                        id: 'op_${DateTime.now().microsecondsSinceEpoch}',
-                        farmId: farmId,
-                        type: OperationType.cropPlant,
-                        title: 'Farm Created',
-                        titleKey: 'farm_created',
-                        description: '$_selectedCrop · $areaHa ha',
-                        timestamp: DateTime.now(),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(
-                  l.tr('add_farm'),
-                  style: AppFonts.font(fontWeight: FontWeight.w700),
-                ),
               ),
             ),
           ],

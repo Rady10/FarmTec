@@ -3,6 +3,7 @@ import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/providers/theme_provider.dart';
 import 'package:farmtec/core/themes/pallete.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
 import 'package:farmtec/features/dashboard/presentation/widgets/dashboard_icon_button.dart';
 import 'package:farmtec/features/farm_selection/presentation/screens/farm_selection_screen.dart';
 import 'package:farmtec/features/notifications/presentation/screens/notifications_screen.dart';
@@ -64,9 +65,42 @@ class DashboardHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              l.tr('good_morning'),
-              style: AppFonts.font(fontSize: 12, color: subColor),
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, _) {
+                final raw = authProvider.user?.username;
+                final greeting = l.tr('good_morning');
+                if (raw != null && raw.isNotEmpty) {
+                  final formatted = raw
+                      .replaceAll('_', ' ')
+                      .split(' ')
+                      .map((w) => w.isNotEmpty
+                          ? '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}'
+                          : '')
+                      .join(' ');
+                  return Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$greeting, ',
+                          style: AppFonts.font(fontSize: 12, color: subColor),
+                        ),
+                        TextSpan(
+                          text: formatted,
+                          style: AppFonts.font(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: subColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Text(
+                  greeting,
+                  style: AppFonts.font(fontSize: 12, color: subColor),
+                );
+              },
             ),
             const SizedBox(height: 2),
             GestureDetector(

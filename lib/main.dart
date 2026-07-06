@@ -5,6 +5,7 @@ import 'package:farmtec/core/providers/theme_provider.dart';
 import 'package:farmtec/core/services/push_notification_service.dart';
 import 'package:farmtec/core/services/app_notification_service.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
+import 'package:farmtec/features/auth/presentation/providers/auth_provider.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:farmtec/core/services/notification_settings_service.dart';
 import 'package:farmtec/core/services/soil_health_service.dart';
@@ -27,6 +28,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => FarmHistoryService()),
         ChangeNotifierProvider(
           create: (context) => FarmProvider(
