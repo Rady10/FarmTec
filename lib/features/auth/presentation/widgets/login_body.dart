@@ -266,28 +266,15 @@ class _LoginBodyState extends State<LoginBody>
                             ),
                             const SizedBox(height: 20),
                             // Social buttons matching mockup style cards
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _socialButton(
-                                    'Google',
-                                    Assets.googleIcon,
-                                    cardColor,
-                                    isDark ? Pallete.darkOutline : const Color(0xFFE8ECE9),
-                                    textColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _socialButton(
-                                    'Apple',
-                                    Assets.appleIcon,
-                                    cardColor,
-                                    isDark ? Pallete.darkOutline : const Color(0xFFE8ECE9),
-                                    textColor,
-                                  ),
-                                ),
-                              ],
+                            SizedBox(
+                              width: double.infinity,
+                              child: _socialButton(
+                                'Google',
+                                Assets.googleIcon,
+                                cardColor,
+                                isDark ? Pallete.darkOutline : const Color(0xFFE8ECE9),
+                                textColor,
+                              ),
                             ),
                             const Spacer(flex: 1),
                             // Bottom switcher banner matching mockup
