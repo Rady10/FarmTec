@@ -87,4 +87,21 @@ void main() {
     expect(result, contains('3.2'));
     expect(result, contains('Apply at tillering stage'));
   });
+
+  test('model formatter parses crop rotation response', () {
+    final l = AppLocalizations(const Locale('en'));
+    final result = formatModelResult(
+      modelName: 'Crop Rotation',
+      data: {
+        'recommended_crop': 'maize',
+        'reason': 'Improves soil nitrogen balance',
+        'rotation_plan': 'Plant maize after wheat for two seasons',
+      },
+      l: l,
+    );
+
+    expect(result, contains('Crop Rotation'));
+    expect(result, contains('Maize'));
+    expect(result, contains('Improves soil nitrogen balance'));
+  });
 }

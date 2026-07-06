@@ -29,11 +29,13 @@ class AIModelFieldDefinition {
   final String label;
   final String hint;
   final TextInputType type;
+  final List<String>? options; // For dropdown/select fields
 
   const AIModelFieldDefinition({
     required this.key,
     required this.label,
     required this.hint,
     required this.type,
+    this.options,
   });
 }

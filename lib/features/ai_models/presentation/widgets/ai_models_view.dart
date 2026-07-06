@@ -129,6 +129,33 @@ class AIModelsView extends StatelessWidget {
       ],
     ),
     AIModelDefinition(
+      name: 'Crop Rotation',
+      desc: 'Recommends a balanced rotation plan using current crop, soil health, and season data.',
+      icon: Icons.eco_rounded,
+      backgroundImage: 'assets/images/rotation_illus.png',
+      apiUrl: 'https://y-s-r-rotation.hf.space/predict',
+      fields: [
+        AIModelFieldDefinition(
+          key: 'current_crop',
+          label: 'Current Crop',
+          hint: 'Wheat',
+          type: TextInputType.text,
+        ),
+        AIModelFieldDefinition(
+          key: 'soil_health',
+          label: 'Soil Health (%)',
+          hint: '70',
+          type: TextInputType.numberWithOptions(decimal: true),
+        ),
+        AIModelFieldDefinition(
+          key: 'year',
+          label: 'Year',
+          hint: '2026',
+          type: TextInputType.number,
+        ),
+      ],
+    ),
+    AIModelDefinition(
       name: 'Soil Health',
       desc: 'Assess soil quality from field coordinates and receive health scoring guidance.',
       icon: Icons.terrain_rounded,
@@ -191,6 +218,13 @@ class AIModelsView extends StatelessWidget {
           label: 'Fertilizer Type',
           hint: 'Urea (46% N)',
           type: TextInputType.text,
+          options: [
+            'Urea (46% N)',
+            'Ammonium Nitrate (33.5% N)',
+            'Ammonium Sulfate (20.6% N)',
+            'Calcium Nitrate (15.5% N)',
+            'Calcium Ammonium Nitrate (27% N)',
+          ],
         ),
         AIModelFieldDefinition(
           key: 'plant_date',

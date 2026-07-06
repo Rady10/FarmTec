@@ -6,6 +6,7 @@ import 'package:farmtec/core/themes/app_fonts.dart';
 import 'package:farmtec/core/l10n/app_localizations.dart';
 import 'package:farmtec/core/services/farm_history_service.dart';
 import 'package:farmtec/core/services/plant_disease_vision_service.dart';
+import 'package:farmtec/core/services/soil_health_service.dart';
 import 'package:farmtec/core/services/yield_prediction_service.dart';
 import 'package:farmtec/core/services/crop_lifecycle_service.dart';
 import 'package:farmtec/features/dashboard/presentation/utils/market_crop_utils.dart';
@@ -13,11 +14,38 @@ import 'package:farmtec/core/themes/app_theme_colors.dart';
 import 'package:farmtec/core/themes/pallete.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_background.dart';
 import 'package:farmtec/features/ai_models/presentation/widgets/ai_model_definition.dart';
+import 'package:farmtec/features/ai_models/presentation/widgets/model_results/model_results.dart';
 import 'package:farmtec/features/farm/presentation/providers/farm_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
+Map<String, dynamic> _stringKeyedMap(dynamic data) {
+  if (data is Map) {
+    return data.map((key, value) => MapEntry(key.toString(), value));
+  }
+  return <String, dynamic>{};
+}
+
+String findClosestCropRotationFarmId(List<String> farmIds, double lat, double lng) {
+  var bestId = farmIds.isNotEmpty ? farmIds.first : 'F_28.825_30.775';
+  var bestDistance = double.infinity;
+  for (final id in farmIds) {
+    final parts = id.split('_');
+    if (parts.length != 3) continue;
+    final candidateLat = double.tryParse(parts[1]);
+    final candidateLng = double.tryParse(parts[2]);
+    if (candidateLat == null || candidateLng == null) continue;
+    final distance = (lat - candidateLat) * (lat - candidateLat) +
+        (lng - candidateLng) * (lng - candidateLng);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestId = id;
+    }
+  }
+  return bestId;
+}
 
 String formatModelResult({
   required String modelName,
@@ -37,6 +65,44 @@ String formatModelResult({
       return l.convertNumbers(
         l.trParams('recommended_crop', {'crop': crop}),
       );
+    case 'Crop Rotation':
+      final payload = _stringKeyedMap(data);
+      if (payload.isNotEmpty) {
+        final recommendedCrop = (payload['recommended_crop'] ?? payload['next_crop'] ?? payload['crop'] ?? 'Unknown').toString();
+        final cropLabel = recommendedCrop.isNotEmpty
+            ? recommendedCrop[0].toUpperCase() + recommendedCrop.substring(1)
+            : recommendedCrop;
+
+        final reason = (payload['reason'] ?? payload['recommendation'] ?? payload['explanation'] ?? '').toString();
+        final sequence = payload['sequence'];
+        final summary = payload['summary'];
+        final lines = <String>[
+          l.tr('crop_rotation'),
+          l.trParams('crop_rotation_recommended_crop', {'crop': cropLabel}),
+        ];
+
+        if (reason.isNotEmpty) {
+          lines.add(l.trParams('crop_rotation_reason', {'reason': reason}));
+        } else if (summary is Map && summary.isNotEmpty) {
+          final soilInfo = summary.entries.where((entry) => entry.key.toString().toLowerCase().contains('soil')).toList();
+          if (soilInfo.isNotEmpty) {
+            lines.add(l.trParams('crop_rotation_reason', {'reason': soilInfo.map((entry) => '${entry.key}: ${entry.value}').join(' • ')}));
+          }
+        }
+
+        if (sequence is List && sequence.isNotEmpty) {
+          final firstStep = sequence.first;
+          if (firstStep is Map) {
+            final stepCrop = (firstStep['Recommended Crop'] ?? firstStep['crop'] ?? '').toString();
+            if (stepCrop.isNotEmpty) {
+              lines.add(l.trParams('crop_rotation_plan', {'plan': 'Season 1 → $stepCrop'}));
+            }
+          }
+        }
+
+        return l.convertNumbers(lines.join('\n'));
+      }
+      return l.convertNumbers('${l.tr('crop_rotation')} $data');
     case 'Yield Prediction':
       final y = data['predicted_yield'] ?? data['yield'] ?? data['prediction'];
       if (y == null) {
@@ -67,47 +133,6 @@ String formatModelResult({
           l.trParams('model_result_season', {'season': '$season'}),
         ].join('\n'),
       );
-    case 'Market Forecast':
-      if (data is List && data.isNotEmpty) {
-        final forecastTitle = l.tr('model_result_market_forecast');
-        final lines = data.take(5).map((e) {
-          final rawPrice = e['price'];
-          final num priceNum = rawPrice is num
-              ? rawPrice
-              : num.tryParse(rawPrice?.toString() ?? '0') ?? 0;
-          return l.trParams('model_result_market_item', {
-            'commodity': '${e['commodity'] ?? l.tr('model_result_unknown')}',
-            'price': formatEgp?.call(priceNum, l) ??
-                l.convertNumbers(priceNum.toStringAsFixed(2)),
-          });
-        }).join('\n');
-        return l.convertNumbers('$forecastTitle\n$lines');
-      }
-      return l.convertNumbers('${l.tr('model_result_market_forecast')} $data');
-    case 'Soil Health':
-      if (data is Map<String, dynamic>) {
-        final soilData = data['data'];
-        if (soilData is Map<String, dynamic>) {
-          final score = soilData['overall_score'];
-          final rating = soilData['rating']?.toString() ?? l.tr('model_result_unknown');
-          final limitingFactor = soilData['limiting_factor']?.toString() ?? l.tr('model_result_unknown');
-          final recommendation = soilData['recommendation']?.toString() ?? l.tr('model_result_unknown');
-          final distance = soilData['distance_to_nearest_data_km'];
-          final scoreText = score is num ? score.toStringAsFixed(1) : score?.toString() ?? l.tr('model_result_unknown');
-          final distanceText = distance is num ? distance.toStringAsFixed(1) : distance?.toString() ?? l.tr('model_result_unknown');
-          return l.convertNumbers(
-            [
-              l.tr('model_result_soil_health_report'),
-              l.trParams('model_result_soil_health_score', {'score': '$scoreText'}),
-              l.trParams('model_result_soil_health_rating', {'rating': '$rating'}),
-              l.trParams('model_result_soil_health_limiting', {'factor': '$limitingFactor'}),
-              l.trParams('model_result_soil_health_recommendation', {'recommendation': '$recommendation'}),
-              l.trParams('model_result_soil_health_distance', {'distance': '$distanceText'}),
-            ].join('\n'),
-          );
-        }
-      }
-      return l.convertNumbers('${l.tr('model_result_soil_health_report')} $data');
     case 'Fertilizer Planner':
       if (data is Map<String, dynamic>) {
         Map<String, dynamic>? payload;
@@ -177,6 +202,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
   XFile? _selectedImage;
   bool _loading = false;
   String? _result;
+  dynamic _resultData;
   bool _isError = false;
 
   String _lastScanLabel(AppLocalizations l) {
@@ -216,6 +242,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
       for (final f in widget.model.fields) f.key: TextEditingController(),
     };
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final yieldService = Provider.of<YieldPredictionService>(context, listen: false);
+      final cachedYieldText = yieldService.yieldPerHa.toStringAsFixed(2);
       final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
       if (farm != null) {
         if (farm.lat != 0 && _controllers.containsKey('lat')) {
@@ -227,11 +255,24 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         if (_controllers.containsKey('crop') && farm.crop.isNotEmpty) {
           _controllers['crop']!.text = farm.crop;
         }
+        if (_controllers.containsKey('current_crop') && farm.crop.isNotEmpty) {
+          _controllers['current_crop']!.text = farm.crop;
+        }
+        if (_controllers.containsKey('soil_health')) {
+          final soilHealthService = Provider.of<SoilHealthService>(context, listen: false);
+          soilHealthService
+              .getScoreForLocation(lat: farm.lat, lng: farm.lng)
+              .then((score) {
+            if (mounted && score > 0) {
+              _controllers['soil_health']!.text = score.toStringAsFixed(1);
+            }
+          });
+        }
         if (_controllers.containsKey('year')) {
           _controllers['year']!.text = DateTime.now().year.toString();
         }
         if (_controllers.containsKey('predicted_yield')) {
-          _controllers['predicted_yield']!.text = '4.5';
+          _controllers['predicted_yield']!.text = cachedYieldText;
         }
         if (_controllers.containsKey('soil_nitrogen')) {
           _controllers['soil_nitrogen']!.text = '0.1';
@@ -264,7 +305,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         }
       } else {
         if (_controllers.containsKey('predicted_yield')) {
-          _controllers['predicted_yield']!.text = '4.5';
+          _controllers['predicted_yield']!.text = cachedYieldText;
         }
         if (_controllers.containsKey('soil_nitrogen')) {
           _controllers['soil_nitrogen']!.text = '0.1';
@@ -356,6 +397,47 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         : 'EGP $formatted${l.tr('per_ton')}';
   }
 
+  Future<double> _resolveSoilHealthScore(Farm? farm) async {
+    final soilHealthService = Provider.of<SoilHealthService>(context, listen: false);
+    if (farm != null && farm.lat != 0 && farm.lng != 0) {
+      final score = await soilHealthService.getScoreForLocation(lat: farm.lat, lng: farm.lng);
+      if (score > 0) {
+        return score;
+      }
+    }
+    return 70.0;
+  }
+
+  Future<String> _resolveCropRotationFarmId(Farm? farm) async {
+    final apiUri = Uri.parse(widget.model.apiUrl);
+    final farmIdsUri = apiUri.replace(path: '/farm_ids', queryParameters: null);
+    try {
+      final response = await http
+          .get(farmIdsUri)
+          .timeout(const Duration(seconds: 30));
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+        if (decoded is Map<String, dynamic>) {
+          final raw = decoded['farm_ids'];
+          if (raw is List) {
+            final validIds = raw.whereType<String>().toList();
+            if (validIds.isNotEmpty) {
+              if (farm != null && farm.lat != 0 && farm.lng != 0) {
+                return findClosestCropRotationFarmId(validIds, farm.lat, farm.lng);
+              }
+              return validIds.first;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+
+    if (farm != null) {
+      return 'F_${farm.lat.toStringAsFixed(3)}_${farm.lng.toStringAsFixed(3)}';
+    }
+    return 'F_28.825_30.775';
+  }
+
   Future<void> _runStandardPrediction(AppLocalizations l) async {
     http.Response response;
     if (widget.model.name == 'Market Forecast') {
@@ -392,6 +474,31 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         {'code': response.statusCode.toString()},
       );
       return;
+    } else if (widget.model.name == 'Crop Rotation') {
+      final farm = Provider.of<FarmProvider>(context, listen: false).selectedFarm;
+      final currentCrop = _controllers['current_crop']?.text.trim().isNotEmpty == true
+          ? _controllers['current_crop']!.text.trim()
+          : (farm?.crop ?? 'wheat');
+      final requestedSoilHealth = _controllers['soil_health']?.text.trim().isNotEmpty == true
+          ? double.tryParse(_controllers['soil_health']!.text.trim())
+          : null;
+      final yearValue = _controllers['year']?.text.trim().isNotEmpty == true
+          ? int.tryParse(_controllers['year']!.text.trim()) ?? DateTime.now().year
+          : DateTime.now().year;
+
+      final soilHealthValue = requestedSoilHealth ?? await _resolveSoilHealthScore(farm);
+      final farmId = await _resolveCropRotationFarmId(farm);
+
+      final uri = Uri.parse(widget.model.apiUrl).replace(queryParameters: {
+        'farm_id': farmId,
+        'current_crop': currentCrop,
+        'soil_health': soilHealthValue.toStringAsFixed(1),
+        'year': yearValue.toString(),
+      });
+
+      response = await http
+          .get(uri)
+          .timeout(const Duration(seconds: 30));
     } else if (widget.model.name == 'Irrigation Planner') {
       final body = <String, dynamic>{};
       for (final f in widget.model.fields) {
@@ -501,7 +608,15 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
     }
     if (!mounted) return;
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      dynamic decoded;
+      try {
+        decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      } catch (_) {
+        _isError = true;
+        _result = l.tr('connection_error');
+        return;
+      }
+      _resultData = decoded;
       _result = formatModelResult(
         modelName: widget.model.name,
         data: decoded,
@@ -516,6 +631,22 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
         {'code': response.statusCode.toString()},
       );
     }
+  }
+
+  String _localizedFieldLabel(AppLocalizations l, AIModelFieldDefinition field) {
+    return l.trOr('field_${field.key}', field.label == 'Latitude'
+        ? l.tr('latitude')
+        : field.label == 'Longitude'
+            ? l.tr('longitude')
+            : field.label == 'Year'
+                ? l.tr('year')
+                : field.label == 'Crop'
+                    ? l.tr('crop_type')
+                    : field.label);
+  }
+
+  String _localizedFieldHint(AppLocalizations l, AIModelFieldDefinition field) {
+    return l.trOr('hint_${field.key}', field.hint);
   }
 
   String? _titleKeyForModel(String name) {
@@ -865,7 +996,7 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                               },
 
                               decoration: InputDecoration(
-                                labelText: l.tr('crop_type'),
+                                labelText: _localizedFieldLabel(l, f),
                                 labelStyle: AppFonts.font(
                                   fontSize: 13,
                                   color: subColor,
@@ -891,6 +1022,61 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                             ),
                           );
                         }
+                        
+                        // Handle dropdown fields
+                        if (f.options != null && f.options!.isNotEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: DropdownButtonFormField<String>(
+                              initialValue: _controllers[f.key]!.text.isNotEmpty
+                                  ? _controllers[f.key]!.text
+                                  : null,
+                              items: f.options!
+                                  .map(
+                                    (option) => DropdownMenuItem(
+                                      value: option,
+                                      child: Text(
+                                        option,
+                                        style: AppFonts.font(fontSize: 14),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _controllers[f.key]!.text = value;
+                                  });
+                                }
+                              },
+                              decoration: InputDecoration(
+                                labelText: _localizedFieldLabel(l, f),
+                                labelStyle: AppFonts.font(
+                                  fontSize: 13,
+                                  color: subColor,
+                                ),
+                                filled: true,
+                                fillColor: fillColor,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide(
+                                    color: accentGreen,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 16,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: TextField(
@@ -901,16 +1087,8 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                               color: textColor,
                             ),
                             decoration: InputDecoration(
-                              labelText: f.label == 'Latitude'
-                                  ? l.tr('latitude')
-                                  : f.label == 'Longitude'
-                                      ? l.tr('longitude')
-                                      : f.label == 'Year'
-                                          ? l.tr('year')
-                                          : f.label == 'Crop'
-                                              ? l.tr('crop_type')
-                                              : f.label,
-                              hintText: f.hint,
+                              labelText: _localizedFieldLabel(l, f),
+                              hintText: _localizedFieldHint(l, f),
                               labelStyle: AppFonts.font(
                                 fontSize: 13,
                                 color: subColor,
@@ -987,64 +1165,11 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
                   ),
                   if (_result != null) ...[
                     const SizedBox(height: 24),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _isError
-                              ? Pallete.error.withAlpha(60)
-                              : accentGreen.withAlpha(60),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (_isError
-                                    ? Pallete.error
-                                    : accentGreen)
-                                .withAlpha(15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                _isError
-                                    ? Icons.warning_amber_rounded
-                                    : Icons.insights_rounded,
-                                color: _isError
-                                    ? Pallete.error
-                                    : accentGreen,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _isError ? l.tr('error') : l.tr('prediction_results'),
-                                style: AppFonts.font(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w800,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            _result!,
-                            style: AppFonts.font(
-                              fontSize: 13,
-                              color: textColor,
-                              height: 1.6,
-                            ),
-                          ),
-                        ],
-                      ),
+                    _buildModelResultCard(
+                      l: l,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      accentGreen: accentGreen,
                     ),
                   ],
                 ],
@@ -1053,6 +1178,243 @@ class _AiModelRunScreenState extends State<AiModelRunScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildResultLine(
+    String line, {
+    required Color bulletColor,
+    required Color textColor,
+  }) {
+    final colonIndex = line.indexOf(':');
+    final hasLabel = colonIndex > 0;
+    final label = hasLabel ? line.substring(0, colonIndex + 1) : '';
+    final value = hasLabel ? line.substring(colonIndex + 1).trim() : line;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          margin: const EdgeInsets.only(top: 6),
+          decoration: BoxDecoration(
+            color: bulletColor,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: hasLabel
+              ? Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$label ',
+                        style: AppFonts.font(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
+                      ),
+                      TextSpan(
+                        text: value,
+                        style: AppFonts.font(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: textColor,
+                          height: 1.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Text(
+                  value,
+                  style: AppFonts.font(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: textColor,
+                    height: 1.6,
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModelResultCard({
+    required AppLocalizations l,
+    required Color cardColor,
+    required Color textColor,
+    required Color accentGreen,
+  }) {
+    if (_isError) {
+      return _buildResultCardShell(
+        cardColor: cardColor,
+        textColor: textColor,
+        accentGreen: accentGreen,
+        title: l.tr('error'),
+        children: [
+          _buildResultText(_result ?? l.tr('connection_error'), textColor, accentGreen),
+        ],
+      );
+    }
+
+    if (_resultData != null) {
+      switch (widget.model.name) {
+        case 'Disease Detection':
+          return DiseaseDetectionResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Crop Recommendation':
+          return CropRecommendationResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Crop Rotation':
+          return CropRotationResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Yield Prediction':
+          return YieldPredictionResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Irrigation Planner':
+          return IrrigationPlannerResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Market Forecast':
+          return MarketForecastResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Soil Health':
+          return SoilHealthResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        case 'Fertilizer Planner':
+          return FertilizerPlannerResultsCard(
+            data: _resultData,
+            l: l,
+            cardColor: cardColor,
+            textColor: textColor,
+            accentGreen: accentGreen,
+          );
+        default:
+          break;
+      }
+    }
+
+    return _buildResultCardShell(
+      cardColor: cardColor,
+      textColor: textColor,
+      accentGreen: accentGreen,
+      title: l.tr('prediction_results'),
+      children: [
+        _buildResultText(_result ?? '', textColor, accentGreen),
+      ],
+    );
+  }
+
+  Widget _buildResultCardShell({
+    required Color cardColor,
+    required Color textColor,
+    required Color accentGreen,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: accentGreen.withAlpha(60),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accentGreen.withAlpha(15),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.insights_rounded,
+                color: accentGreen,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: AppFonts.font(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultText(String text, Color textColor, Color bulletColor) {
+    final lines = text
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: lines
+          .map(
+            (line) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _buildResultLine(
+                line,
+                bulletColor: bulletColor,
+                textColor: textColor,
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
