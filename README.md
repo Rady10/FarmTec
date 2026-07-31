@@ -112,4 +112,3 @@ Project Link: [https://github.com/Rady10/FarmTec](https://github.com/Rady10/Farm
 *   [Open-Meteo](https://open-meteo.com/)
 *   [Hugging Face Spaces](https://huggingface.co/spaces)
 *   [Groq](https://groq.com/)
-*   [Esri](https://www.esri.com/)
