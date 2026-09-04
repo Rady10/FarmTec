@@ -1,114 +1,334 @@
 # FarmTec
 
-**Precision Intelligence for the Modern Farm**
+### Precision Intelligence for the Modern Farm
 
-## Overview
+**FarmTec** is an AI-powered, cross-platform agricultural application built with **Flutter** to help farmers and agricultural professionals manage their farms, monitor crop health, analyze soil conditions, track market prices, and make smarter farming decisions.
 
-FarmTec is a comprehensive, AI-powered mobile application designed to assist modern farmers and agricultural enthusiasts. Built with Flutter, it provides precision intelligence through features like farm management, soil analysis, market monitoring, and state-of-the-art AI-driven agricultural and medical assistants. The app emphasizes robust multi-lingual support, primarily targeting English and Arabic speakers, and aims to make complex agricultural data understandable for both novice and expert users.
+The application combines **AI, computer vision, real-time weather data, satellite mapping, and agricultural knowledge** into a single, accessible platform with full **English and Arabic** support.
 
-## Features
+---
 
-FarmTec offers a rich set of features to empower farmers and agricultural professionals:
+## ✨ Features
 
-### User Experience & Accessibility
+### 🌾 Farm Management
 
-*   **Splash Screen & Onboarding**: A redesigned animated splash screen with plant growth animation and a guided onboarding flow for new users.
-*   **Multilingual Support**: Seamless, dynamic localization switching between English and Arabic, including farmer-friendly Arabic translations, terminology tooltips, and full Right-to-Left (RTL) layout support.
-*   **Dark Mode**: Full dark theme support with a forest-inspired color palette, with user preferences persisted across sessions.
-*   **Intuitive Design**: Features micro-animations, consistent visual elements, help tooltips for technical terms, and illustrated empty states for a premium and accessible user experience.
+* Create and manage multiple farms
+* Select an active farm as the context for agricultural operations
+* Interactive satellite maps
+* GPS-based farm location selection
+* Farm dashboard with important metrics and alerts
+* Crop health visualization using vegetation/NDVI data
 
-### Authentication & Farm Management
+### 📊 Agricultural Tools
 
-*   **Secure Authentication**: Responsive login and signup screens with email/password and social login (Google, Apple). Signup includes fields for Full Name, Email, Password, Phone Number, optional Farm Name, Location/Region, and User Role (Farmer/Expert/Student).
-*   **Farm Selection**: A post-login screen to select existing farms or add a new one. The selected farm becomes the active context for the dashboard and all features.
-*   **Interactive Map**: Satellite map preview in the "Add Farm" sheet with tap-to-set-location and live GPS coordinate filling.
+* **Soil Analysis** — Monitor soil health, moisture, and nutrient information.
+* **Profit Calculator** — Estimate expected yields and potential profits using market prices and input costs.
+* **Market Monitoring** — Track agricultural commodity prices, trends, and forecasts.
+* **Task Management** — Schedule and manage irrigation, fertilization, and spraying tasks.
+* **Weather Monitoring** — Access live weather information based on the farm location.
 
-### Core Agricultural Tools
+### 🤖 AI-Powered Features
 
-*   **Dashboard**: A unified dashboard providing an at-a-glance overview of farm metrics, activities, and alerts. Includes live weather data from Open-Meteo API and smart nudges for pending actions.
-*   **My Farm**: Detailed farm management connected to a centralized service, featuring an interactive satellite map view with an advanced NDVI / Vegetation Index Layer overlay to visualize crop health.
-*   **Task Automation System**: Create and manage tasks (Irrigation, Fertilization, Spraying) with scheduling, worker assignment, and completion tracking.
-*   **Profit Calculator**: A financial tool to estimate expected yields and calculate potential profit based on market prices and input costs.
-*   **Soil Analysis**: Tools and data points for tracking soil health, moisture levels, and nutrient profiles.
-*   **Market Monitoring**: Real-time market monitoring, commodity prices, and agricultural trends with expandable forecast details and crop-specific visual icons.
+#### 🦠 Plant Disease Diagnostics
 
-### AI-Powered Assistants
+An AI-powered agricultural assistant that allows users to upload plant images and receive disease-related analysis and agricultural recommendations.
 
-*   **AI Agriculture Assistant (Plant Disease Diagnostics)**: Powered by a fine-tuned Qwen3-VL-2B vision-language model (deployed on Hugging Face Spaces) with a RAG pipeline utilizing the AgroLLM knowledge base. Allows image uploads for disease identification and natural language questions for agricultural advice.
-*   **AI Medicine Chat**: An interactive, AI-powered medical assistant utilizing the Groq Vision model. Analyzes uploaded images of agricultural or standard medicines to provide contextual, structured medical reports in Arabic, supporting follow-up text conversations.
-*   **FarmBrain AI Chat**: A ChatGPT-inspired chat interface for general agricultural queries, featuring a clean UI, conversation history, and animated typing indicators.
+The system uses:
 
-## Technical Stack
+* Fine-tuned **Qwen3-VL-2B**
+* Vision-language processing
+* **RAG (Retrieval-Augmented Generation)**
+* AgroLLM agricultural knowledge base
+* Hugging Face Spaces for model deployment
 
-FarmTec is built using modern and robust technologies:
+#### 💊 AI Medicine Assistant
 
-*   **Frontend / Mobile Client**: Flutter (Dart ^3.7.0)
-*   **UI Components & Theming**: Material Design 3, `cupertino_icons`, `google_fonts`, `svg_flutter`.
-*   **Data Visualization**: `fl_chart`.
-*   **Local Storage**: `shared_preferences`.
-*   **Localization**: `flutter_localizations`, `intl`.
-*   **AI & Machine Learning (Backend Services)**:
-    *   Fine-tuned Qwen3-VL-2B (Vision-Language processing for plant diseases).
-    *   Hugging Face Spaces (Model hosting).
-    *   Groq Vision (Medicine analysis).
-    *   RAG Architecture with AgroLLM.
-*   **Weather API**: Open-Meteo (`api.open-meteo.com`).
-*   **Mapping**: `flutter_map` with `latlong2` for satellite map views, utilizing Esri World Imagery tile provider.
+An AI assistant capable of analyzing uploaded medicine images and generating structured contextual reports.
 
-## Installation
+Powered by:
 
-To get a local copy up and running, follow these simple steps.
+* **Groq Vision**
+* Image analysis
+* Arabic responses
+* Follow-up conversations
+
+#### 🧠 FarmBrain AI
+
+A ChatGPT-inspired agricultural assistant designed for general farming questions.
+
+Features include:
+
+* Natural-language conversations
+* Conversation history
+* Animated typing indicators
+* Agricultural-focused responses
+
+---
+
+## 🌍 Localization & Accessibility
+
+FarmTec is designed to be accessible to both English- and Arabic-speaking users.
+
+* 🇬🇧 English support
+* 🇪🇬 Arabic support
+* ↔️ Full RTL layout support
+* Farmer-friendly Arabic terminology
+* Technical term tooltips
+* Dynamic language switching
+
+---
+
+## 🎨 User Experience
+
+FarmTec focuses on providing a modern and accessible mobile experience.
+
+* Animated splash screen
+* Guided onboarding
+* Material Design 3
+* Dark mode
+* Persistent user preferences
+* Micro-animations
+* Illustrated empty states
+* Responsive UI
+* Consistent design system
+
+---
+
+## 🗺️ Maps & Crop Monitoring
+
+FarmTec integrates interactive satellite maps to help users visualize and manage their farms.
+
+The application uses:
+
+* `flutter_map`
+* `latlong2`
+* Esri World Imagery
+* GPS coordinates
+* Vegetation/NDVI overlays
+
+This allows farmers to better understand their farm location and monitor vegetation conditions.
+
+---
+
+## 🏗️ Application Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │      FarmTec        │
+                    │   Flutter Client    │
+                    └──────────┬──────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+   ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+   │ Weather API │      │ Map Services │      │ Market Data │
+   │ Open-Meteo  │      │ Esri / Maps  │      │   Services  │
+   └─────────────┘      └─────────────┘      └─────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    AI Services      │
+                    ├─────────────────────┤
+                    │ Qwen3-VL-2B         │
+                    │ AgroLLM + RAG       │
+                    │ Groq Vision        │
+                    │ Hugging Face       │
+                    └─────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Category                | Technologies                |
+| ----------------------- | --------------------------- |
+| **Framework**           | Flutter                     |
+| **Language**            | Dart                        |
+| **UI**                  | Material Design 3           |
+| **Charts**              | fl_chart                    |
+| **Localization**        | Flutter Localizations, Intl |
+| **Local Storage**       | SharedPreferences           |
+| **Maps**                | flutter_map, latlong2       |
+| **Satellite Imagery**   | Esri World Imagery          |
+| **Weather**             | Open-Meteo API              |
+| **AI Vision**           | Qwen3-VL-2B                 |
+| **AI Platform**         | Hugging Face Spaces         |
+| **Vision AI**           | Groq Vision                 |
+| **Knowledge Retrieval** | RAG + AgroLLM               |
+
+---
+
+## 📁 Project Structure
+
+```text
+FarmTec/
+│
+├── android/
+├── ios/
+├── linux/
+├── macos/
+├── web/
+├── windows/
+│
+├── assets/
+│   └── images/
+│
+├── lib/
+│   ├── ...
+│   └── Application source code
+│
+├── test/
+│
+├── agromonitoring.env.example
+├── mapbox.env.example
+├── data.json
+├── pubspec.yaml
+├── prd.md
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Ensure you have Flutter installed. For installation instructions, refer to the [official Flutter documentation](https://docs.flutter.dev/get-started/install).
+Make sure you have Flutter installed and configured on your machine.
 
-### Clone the repository
+Check your Flutter installation:
+
+```bash
+flutter doctor
+```
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Rady10/FarmTec.git
+
 cd FarmTec
 ```
 
-### Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 flutter pub get
 ```
 
-### Environment Variables
+### 3. Configure Environment Variables
 
-This project uses environment variables for API keys and other configurations. Create `.env` files (e.g., `agromonitoring.env`, `mapbox.env`) based on the provided `.env.example` files and populate them with your respective keys.
+The application uses environment variables for external services and API configuration.
 
-## Usage
+Create the required environment files based on the provided examples:
 
-To run the application on a connected device or emulator:
+```text
+agromonitoring.env.example
+mapbox.env.example
+```
+
+Add your required API keys and configuration values.
+
+> **Important:** Never commit private API keys or secrets to the repository.
+
+### 4. Run the Application
+
+Connect a physical device or start an emulator, then run:
 
 ```bash
 flutter run
 ```
 
-## Contributing
+---
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+## 🔑 External Services
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+FarmTec integrates several external technologies and services:
 
-## License
+* **Open-Meteo** — Weather data
+* **Hugging Face Spaces** — AI model deployment
+* **Groq Vision** — Medicine image analysis
+* **Esri World Imagery** — Satellite imagery
+* **AgroLLM** — Agricultural knowledge for the RAG pipeline
 
-Distributed under the MIT License. See `LICENSE` for more information. (Note: A `LICENSE` file was not found in the repository, assuming MIT for placeholder. Please create one if different.)
+---
 
-## Contact
+## 🎯 Project Goals
 
-Project Link: [https://github.com/Rady10/FarmTec](https://github.com/Rady10/FarmTec)
+FarmTec aims to make modern agricultural technology more accessible by bringing multiple farming tools into one application.
 
-## Acknowledgements
+The project focuses on:
 
-*   [Flutter](https://flutter.dev/)
-*   [Open-Meteo](https://open-meteo.com/)
-*   [Hugging Face Spaces](https://huggingface.co/spaces)
-*   [Groq](https://groq.com/)
+* 🌱 Improving crop monitoring
+* 🦠 Helping identify plant diseases
+* 💧 Supporting better farm management
+* 🌦️ Providing useful weather information
+* 💰 Helping farmers estimate profitability
+* 📈 Making agricultural market information easier to understand
+* 🤖 Using AI to simplify agricultural decision-making
+* 🌍 Making agricultural technology accessible in both English and Arabic
+
+---
+
+## 🔮 Future Improvements
+
+Potential future improvements include:
+
+* Advanced crop yield prediction
+* More crop disease models
+* Automated irrigation recommendations
+* More detailed satellite analytics
+* Historical farm performance analytics
+* Personalized AI farming recommendations
+* Expanded agricultural datasets
+* Push notifications for weather and farm tasks
+* More regional market data
+
+---
+
+## 📱 Screenshots
+
+Add application screenshots here:
+
+```markdown
+![FarmTec Dashboard](assets/screenshots/dashboard.png)
+
+![Farm Management](assets/screenshots/farm.png)
+
+![AI Assistant](assets/screenshots/ai-assistant.png)
+
+![Disease Detection](assets/screenshots/disease-detection.png)
+```
+
+---
+
+## 💡 What This Project Demonstrates
+
+FarmTec demonstrates practical experience with:
+
+* Cross-platform Flutter development
+* AI-powered mobile applications
+* Computer vision
+* Vision-language models
+* Retrieval-Augmented Generation (RAG)
+* REST API integration
+* External API integration
+* Satellite mapping
+* Data visualization
+* Localization and RTL interfaces
+* Modern mobile UI/UX
+* Environment-based configuration
+* Agricultural technology solutions
+
+---
+
+## 🔗 Repository
+
+**FarmTec:**
+https://github.com/Rady10/FarmTec
+
+---
+
+## 📄 License
+
+This project is provided for educational and development purposes.
