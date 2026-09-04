@@ -283,23 +283,7 @@ Potential future improvements include:
 * Expanded agricultural datasets
 * Push notifications for weather and farm tasks
 * More regional market data
-
----
-
-## 📱 Screenshots
-
-Add application screenshots here:
-
-```markdown
-![FarmTec Dashboard](assets/screenshots/dashboard.png)
-
-![Farm Management](assets/screenshots/farm.png)
-
-![AI Assistant](assets/screenshots/ai-assistant.png)
-
-![Disease Detection](assets/screenshots/disease-detection.png)
-```
-
+  
 ---
 
 ## 💡 What This Project Demonstrates
